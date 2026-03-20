@@ -26,7 +26,7 @@ const objectSubItems = [
 ];
 
 const mainItems = [
-  { title: "Главная", path: "/", icon: Home },
+  { title: "Главная", path: "/home", icon: Home },
 ];
 
 const bottomItems = [

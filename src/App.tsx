@@ -31,7 +31,8 @@ const App = () => (
       {/* LOVABLE_KEEP_END */}
         <Routes>
           <Route element={<AppLayout />}>
-            <Route path="/" element={<Navigate to="/objects" replace />} />
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/objects" element={<ObjectsOverview />} />
             <Route path="/objects/products" element={<ObjectList objectType="product" />} />
             <Route path="/objects/products/:id" element={<ObjectDetail />} />
