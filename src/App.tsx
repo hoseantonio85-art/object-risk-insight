@@ -14,12 +14,20 @@ import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
+// LOVABLE_KEEP_START
+// Не изменять этот блок: специфическая настройка basename для GitHub Pages
+const isGitHubPages = window.location.hostname.includes("github.io");
+const basename = isGitHubPages ? "/object-guard-pulse" : "";
+// LOVABLE_KEEP_END
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      {/* LOVABLE_KEEP_START */}
+      <BrowserRouter basename={basename}>
+      {/* LOVABLE_KEEP_END */}
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<Navigate to="/objects" replace />} />
