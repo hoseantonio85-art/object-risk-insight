@@ -4,6 +4,8 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { RiskBadge } from "@/components/RiskBadge";
 import { StatusBadge } from "@/components/StatusBadge";
+import { ObjectDetailModal } from "@/components/ObjectDetailModal";
+import { RiskDetailModal } from "@/components/RiskDetailModal";
 import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, typeLabels } from "@/data/mock";
 
 const riskOptions: { value: RiskLevel | "all"; label: string }[] = [
@@ -36,6 +38,8 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
   const [search, setSearch] = useState("");
   const [riskFilter, setRiskFilter] = useState<RiskLevel | "all">(initialRisk);
   const [statusFilter, setStatusFilter] = useState<AssessmentStatus | "all">("all");
+  const [selectedObjectId, setSelectedObjectId] = useState<string | null>(null);
+  const [selectedRiskId, setSelectedRiskId] = useState<string | null>(null);
 
   const items = useMemo(() => {
     let list = getObjectsByType(objectType);
@@ -55,25 +59,14 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
       <div className="flex items-center gap-3 animate-fade-up stagger-1">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Поиск…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 h-9"
-          />
+          <Input placeholder="Поиск…" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 h-9" />
         </div>
-        <select
-          value={riskFilter}
-          onChange={(e) => setRiskFilter(e.target.value as any)}
-          className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        >
+        <select value={riskFilter} onChange={(e) => setRiskFilter(e.target.value as any)}
+          className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
           {riskOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as any)}
-          className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-        >
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)}
+          className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
           {statusOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
       </div>
@@ -91,11 +84,8 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
           </thead>
           <tbody>
             {items.map((obj) => (
-              <tr
-                key={obj.id}
-                onClick={() => navigate(`/objects/${config.pathSegment}/${obj.id}`)}
-                className="border-b border-border last:border-0 cursor-pointer hover:bg-accent/50 transition-colors active:scale-[0.998]"
-              >
+              <tr key={obj.id} onClick={() => setSelectedObjectId(obj.id)}
+                className="border-b border-border last:border-0 cursor-pointer hover:bg-accent/50 transition-colors active:scale-[0.998]">
                 <td className="px-4 py-3 font-medium text-foreground">{obj.name}</td>
                 <td className="px-4 py-3"><RiskBadge level={obj.riskLevel} /></td>
                 <td className="px-4 py-3"><StatusBadge status={obj.status} /></td>
@@ -103,13 +93,28 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
               </tr>
             ))}
             {items.length === 0 && (
-              <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">Ничего не найдено</td>
-              </tr>
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">Ничего не найдено</td></tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Object Detail Modal */}
+      {selectedObjectId && (
+        <ObjectDetailModal
+          objectId={selectedObjectId}
+          onClose={() => setSelectedObjectId(null)}
+          onOpenRisk={(riskId) => setSelectedRiskId(riskId)}
+        />
+      )}
+
+      {/* Risk Detail Modal (cascading) */}
+      {selectedRiskId && (
+        <RiskDetailModal
+          riskId={selectedRiskId}
+          onClose={() => setSelectedRiskId(null)}
+        />
+      )}
     </div>
   );
 }
