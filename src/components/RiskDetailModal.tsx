@@ -385,7 +385,7 @@ export function RiskDetailModal({ riskId, onClose, onOpenObject }: RiskDetailMod
                   <>
                     <div className="space-y-2 transition-all duration-300">
                       {(manifestationsExpanded ? manifestationsData : previewManifestations).map((m, i) => (
-                        <div key={i} onClick={() => { onClose(); navigate(`/objects/${typePaths[m.object.type]}/${m.object.id}`); }}
+                        <div key={i} onClick={() => onOpenObject?.(m.object.id)}
                           className="flex items-center justify-between rounded-xl border border-border bg-card p-4 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]">
                           <div className="flex items-center gap-3">
                             <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">{typeLabels[m.object.type]}</span>
