@@ -385,8 +385,8 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
 
                 {manifestationsData.length > 0 ? (
                   <>
-                    <div className="space-y-2">
-                      {previewManifestations.map((m, i) => (
+                    <div className="space-y-2 transition-all duration-300">
+                      {(manifestationsExpanded ? manifestationsData : previewManifestations).map((m, i) => (
                         <div key={i} onClick={() => { onClose(); navigate(`/objects/${typePaths[m.object.type]}/${m.object.id}`); }}
                           className="flex items-center justify-between rounded-xl border border-border bg-card p-4 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]">
                           <div className="flex items-center gap-3">
@@ -401,9 +401,10 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
                       ))}
                     </div>
                     {manifestationsData.length > 3 && (
-                      <button className="flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--primary))] hover:underline">
-                        Показать все ({manifestationsData.length})
-                        <ChevronRight className="h-3 w-3" />
+                      <button onClick={() => setManifestationsExpanded(!manifestationsExpanded)}
+                        className="flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--primary))] hover:underline">
+                        {manifestationsExpanded ? "Свернуть" : `Показать все (${manifestationsData.length})`}
+                        <ChevronDown className={cn("h-3 w-3 transition-transform duration-200", manifestationsExpanded && "rotate-180")} />
                       </button>
                     )}
                   </>
