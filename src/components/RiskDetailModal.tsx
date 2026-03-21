@@ -196,7 +196,7 @@ export function RiskDetailModal({ riskId, onClose, onOpenObject, zIndex = 50 }: 
   const previewSources = sources.slice(0, 3);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center">
+    <div className="fixed inset-0 flex items-start justify-center" style={{ zIndex }}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       <div className="relative z-10 w-full max-w-[1320px] max-h-[92vh] mt-[4vh] bg-background rounded-2xl shadow-2xl border border-border flex flex-col animate-in fade-in-0 zoom-in-95 duration-200">

@@ -94,9 +94,10 @@ interface ObjectDetailModalProps {
   objectId: string;
   onClose: () => void;
   onOpenRisk?: (riskId: string) => void;
+  zIndex?: number;
 }
 
-export function ObjectDetailModal({ objectId, onClose, onOpenRisk }: ObjectDetailModalProps) {
+export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }: ObjectDetailModalProps) {
   const obj = objects.find((o) => o.id === objectId);
   const [activeSection, setActiveSection] = useState<string>("overview");
   const [manifestationsExpanded, setManifestationsExpanded] = useState(false);
