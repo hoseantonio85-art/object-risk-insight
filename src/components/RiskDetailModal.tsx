@@ -142,6 +142,8 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
   const risk = risks.find((r) => r.id === riskId);
   const [riskLevelOpen, setRiskLevelOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("overview");
+  const [manifestationsExpanded, setManifestationsExpanded] = useState(false);
+  const [sourcesExpanded, setSourcesExpanded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
