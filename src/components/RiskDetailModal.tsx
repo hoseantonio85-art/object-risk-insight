@@ -142,6 +142,8 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
   const risk = risks.find((r) => r.id === riskId);
   const [riskLevelOpen, setRiskLevelOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("overview");
+  const [manifestationsExpanded, setManifestationsExpanded] = useState(false);
+  const [sourcesExpanded, setSourcesExpanded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -228,24 +230,6 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
               </button>
             ))}
           </div>
-          {/* Change event banner */}
-          {changeEvent && (
-            <div className="mx-8 mt-3 flex items-center gap-2 rounded-lg bg-[hsl(38_92%_95%)] px-4 py-2 text-sm">
-              <Activity className="h-3.5 w-3.5 text-[hsl(38_92%_50%)] shrink-0" />
-              <span className="text-[hsl(38_92%_40%)] font-medium">Риск переоценён:</span>
-              <span className="text-foreground">
-                {levelLabelsRu[changeEvent.previousLevel]} → {levelLabelsRu[changeEvent.currentLevel]}
-              </span>
-              {changeEvent.previousStrategy && changeEvent.currentStrategy && (
-                <>
-                  <span className="text-muted-foreground">·</span>
-                  <span className="text-foreground">
-                    Стратегия: {changeEvent.currentStrategy}
-                  </span>
-                </>
-              )}
-            </div>
-          )}
         </div>
 
         {/* ── Scrollable Content ── */}
@@ -268,6 +252,15 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
                         <span className="inline-flex items-center rounded-md border border-border px-2 py-0.5 text-xs font-medium text-foreground">Снижение</span>
                       </div>
                       <p className="text-sm text-foreground leading-relaxed">{aiSummary}</p>
+                      {changeEvent && (
+                        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[hsl(38_92%_95%)] px-2.5 py-1 text-xs font-medium text-[hsl(38_92%_40%)]">
+                          <Activity className="h-3 w-3 text-[hsl(38_92%_50%)]" />
+                          Переоценён: {levelLabelsRu[changeEvent.previousLevel]} → {levelLabelsRu[changeEvent.currentLevel]}
+                          {changeEvent.previousStrategy && changeEvent.currentStrategy && (
+                            <span> · Стратегия: {changeEvent.currentStrategy}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -392,8 +385,8 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
 
                 {manifestationsData.length > 0 ? (
                   <>
-                    <div className="space-y-2">
-                      {previewManifestations.map((m, i) => (
+                    <div className="space-y-2 transition-all duration-300">
+                      {(manifestationsExpanded ? manifestationsData : previewManifestations).map((m, i) => (
                         <div key={i} onClick={() => { onClose(); navigate(`/objects/${typePaths[m.object.type]}/${m.object.id}`); }}
                           className="flex items-center justify-between rounded-xl border border-border bg-card p-4 cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]">
                           <div className="flex items-center gap-3">
@@ -408,9 +401,10 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
                       ))}
                     </div>
                     {manifestationsData.length > 3 && (
-                      <button className="flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--primary))] hover:underline">
-                        Показать все ({manifestationsData.length})
-                        <ChevronRight className="h-3 w-3" />
+                      <button onClick={() => setManifestationsExpanded(!manifestationsExpanded)}
+                        className="flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--primary))] hover:underline">
+                        {manifestationsExpanded ? "Свернуть" : `Показать все (${manifestationsData.length})`}
+                        <ChevronDown className={cn("h-3 w-3 transition-transform duration-200", manifestationsExpanded && "rotate-180")} />
                       </button>
                     )}
                   </>
@@ -432,12 +426,6 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
               <section ref={setSectionRef("sources")} className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm font-semibold text-foreground">Источники анализа</h2>
-                  {sources.length > 3 && (
-                    <button className="flex items-center gap-1 text-xs font-medium text-[hsl(var(--primary))] hover:underline">
-                      Все источники ({sources.length})
-                      <ChevronRight className="h-3 w-3" />
-                    </button>
-                  )}
                 </div>
                 {hasReassessment && (
                   <div className="flex items-center gap-2 rounded-lg bg-[hsl(var(--risk-medium-bg))] border border-[hsl(38_92%_85%)] px-4 py-2.5">
@@ -446,32 +434,41 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
                   </div>
                 )}
                 {sources.length > 0 ? (
-                  <div className="space-y-2">
-                    {previewSources.map((source, i) => {
-                      const Icon = sourceIcons[source.type];
-                      return (
-                        <div key={i} className="rounded-xl border border-border bg-card p-4 hover:shadow-sm transition-shadow">
-                          <div className="flex items-start gap-3">
-                            <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5">
-                              <Icon className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs text-muted-foreground font-medium">{sourceLabels[source.type]}</span>
-                                <span className="text-xs text-muted-foreground">· {source.date}</span>
+                  <>
+                    <div className="space-y-2 transition-all duration-300">
+                      {(sourcesExpanded ? sources : previewSources).map((source, i) => {
+                        const Icon = sourceIcons[source.type];
+                        return (
+                          <div key={i} className="rounded-xl border border-border bg-card p-4 hover:shadow-sm transition-shadow">
+                            <div className="flex items-start gap-3">
+                              <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                                <Icon className="h-4 w-4 text-muted-foreground" />
                               </div>
-                              <h4 className="text-sm font-medium text-foreground mb-0.5">{source.title}</h4>
-                              <p className="text-xs text-muted-foreground leading-relaxed mb-2">{source.description}</p>
-                              <div className="inline-flex items-center gap-1.5 rounded-md bg-[hsl(270_60%_95%)] text-[hsl(270_60%_40%)] px-2.5 py-1 text-xs font-medium">
-                                <Sparkles className="h-3 w-3" />
-                                {source.effect}
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-xs text-muted-foreground font-medium">{sourceLabels[source.type]}</span>
+                                  <span className="text-xs text-muted-foreground">· {source.date}</span>
+                                </div>
+                                <h4 className="text-sm font-medium text-foreground mb-0.5">{source.title}</h4>
+                                <p className="text-xs text-muted-foreground leading-relaxed mb-2">{source.description}</p>
+                                <div className="inline-flex items-center gap-1.5 rounded-md bg-[hsl(270_60%_95%)] text-[hsl(270_60%_40%)] px-2.5 py-1 text-xs font-medium">
+                                  <Sparkles className="h-3 w-3" />
+                                  {source.effect}
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                    {sources.length > 3 && (
+                      <button onClick={() => setSourcesExpanded(!sourcesExpanded)}
+                        className="flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--primary))] hover:underline">
+                        {sourcesExpanded ? "Свернуть" : `Все источники (${sources.length})`}
+                        <ChevronDown className={cn("h-3 w-3 transition-transform duration-200", sourcesExpanded && "rotate-180")} />
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <div className="rounded-xl border border-border bg-card p-5 text-center">
                     <p className="text-sm text-muted-foreground">Источники анализа не зафиксированы</p>
