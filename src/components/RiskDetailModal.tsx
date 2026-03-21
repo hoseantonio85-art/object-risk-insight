@@ -134,9 +134,9 @@ const sections = [
 ] as const;
 
 /* ─── Main Modal Component ─── */
-interface RiskDetailModalProps { riskId: string; onClose: () => void; onOpenObject?: (id: string) => void; }
+interface RiskDetailModalProps { riskId: string; onClose: () => void; onOpenObject?: (id: string) => void; zIndex?: number; }
 
-export function RiskDetailModal({ riskId, onClose, onOpenObject }: RiskDetailModalProps) {
+export function RiskDetailModal({ riskId, onClose, onOpenObject, zIndex = 50 }: RiskDetailModalProps) {
   const risk = risks.find((r) => r.id === riskId);
   const [riskLevelOpen, setRiskLevelOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("overview");
