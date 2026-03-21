@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   X, ChevronRight, ChevronDown, AlertTriangle, Info, Shield, FileText,
   Sparkles, Bot, User, Newspaper, Scale, CircleAlert, CircleDot, Target,
