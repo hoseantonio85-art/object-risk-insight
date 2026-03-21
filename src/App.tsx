@@ -43,7 +43,6 @@ const App = () => (
             <Route path="/objects/ai-agents" element={<ObjectList objectType="ai-agent" />} />
             <Route path="/objects/ai-agents/:id" element={<ObjectDetail />} />
             <Route path="/risks" element={<RisksList />} />
-            <Route path="/risks/:id" element={<RiskDetail />} />
             <Route path="/measures" element={<PlaceholderPage title="Меры" />} />
             <Route path="/incidents" element={<PlaceholderPage title="Инциденты" />} />
             <Route path="/analytics" element={<PlaceholderPage title="Аналитика" />} />
