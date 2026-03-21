@@ -230,24 +230,6 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
               </button>
             ))}
           </div>
-          {/* Change event banner */}
-          {changeEvent && (
-            <div className="mx-8 mt-3 flex items-center gap-2 rounded-lg bg-[hsl(38_92%_95%)] px-4 py-2 text-sm">
-              <Activity className="h-3.5 w-3.5 text-[hsl(38_92%_50%)] shrink-0" />
-              <span className="text-[hsl(38_92%_40%)] font-medium">Риск переоценён:</span>
-              <span className="text-foreground">
-                {levelLabelsRu[changeEvent.previousLevel]} → {levelLabelsRu[changeEvent.currentLevel]}
-              </span>
-              {changeEvent.previousStrategy && changeEvent.currentStrategy && (
-                <>
-                  <span className="text-muted-foreground">·</span>
-                  <span className="text-foreground">
-                    Стратегия: {changeEvent.currentStrategy}
-                  </span>
-                </>
-              )}
-            </div>
-          )}
         </div>
 
         {/* ── Scrollable Content ── */}
