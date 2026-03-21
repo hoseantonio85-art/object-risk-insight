@@ -183,6 +183,7 @@ export function RiskDetailModal({ riskId, onClose }: RiskDetailModalProps) {
   const util = utilization[risk.id];
   const hasReassessment = sources.some(s => s.effect.includes("переоценён"));
   const aiSummary = aiSummaries[risk.id] || `Риск ${risk.level === "high" ? "высокий" : risk.level === "medium" ? "средний" : "низкий"}. Требует внимания.`;
+  const changeEvent = changeEvents[risk.id];
 
   const highCount = manifestationsData.filter(m => m.level === "high").length;
   const mediumCount = manifestationsData.filter(m => m.level === "medium").length;
