@@ -511,8 +511,14 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                 {/* Drawer content */}
                 <div className="flex-1 overflow-y-auto p-5 space-y-5 no-scrollbar">
                   {/* Level & contribution */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <RiskBadge level={m.level} />
+                    {m.risk.riskType === "behavior" && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(270_60%_95%)] text-[hsl(270_60%_40%)] px-2 py-0.5 text-xs font-medium">
+                        <ShieldAlert className="h-3 w-3" />
+                        Поведенческий
+                      </span>
+                    )}
                     <span className="text-xs text-muted-foreground">
                       Вклад: {m.level === "high" ? "45%" : m.level === "medium" ? "30%" : "15%"}
                     </span>
