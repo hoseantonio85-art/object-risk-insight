@@ -310,6 +310,12 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                                     {m.risk.name}
                                   </span>
                                   <RiskBadge level={m.level} />
+                                  {m.risk.riskType === "behavior" && (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(270_60%_95%)] text-[hsl(270_60%_40%)] px-1.5 py-0.5 text-[10px] font-medium">
+                                      <ShieldAlert className="h-2.5 w-2.5" />
+                                      Поведенческий
+                                    </span>
+                                  )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">{m.comment}</p>
                               </div>
