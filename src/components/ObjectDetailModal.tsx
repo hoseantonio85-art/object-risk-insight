@@ -694,6 +694,19 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             </>
           );
         })()}
+
+        {/* ── Version History Drawer ── */}
+        {versionDrawerOpen && versions.length > 0 && (
+          <VersionHistoryDrawer
+            versions={versions}
+            currentVersion={currentVersion}
+            onClose={() => setVersionDrawerOpen(false)}
+            onSelectVersion={(v) => {
+              setVersionDrawerOpen(false);
+              toast({ title: `Версия v${v.version}`, description: `Переключено на версию от ${v.date}` });
+            }}
+          />
+        )}
       </div>
     </div>
   );
