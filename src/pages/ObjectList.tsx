@@ -150,7 +150,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
           manifestations.unshift({
             riskId: manifestation.riskId,
             objectId: item.id,
-            level: manifestation.level,
+            level: manifestation.level as RiskLevel,
             comment: manifestation.comment,
           });
         });
