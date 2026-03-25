@@ -1,6 +1,6 @@
 export type RiskLevel = "high" | "medium" | "low" | "none";
 export type AssessmentStatus = "actual" | "stale" | "progress" | "none";
-export type EvaluationStatus = "ai-analysis" | "needs-review" | "actual";
+export type EvaluationStatus = "ai-analysis" | "needs-review" | "actual" | "none";
 export type ProductLifecycle = "planned" | "active" | "closed";
 export type ObjectType = "product" | "counterparty" | "contract" | "ai-agent";
 export type RiskType = "operational" | "behavior";
@@ -50,6 +50,7 @@ export const evaluationStatusLabels: Record<EvaluationStatus, string> = {
   "ai-analysis": "AI анализ",
   "needs-review": "Анализ завершён",
   actual: "Оценка подтверждена",
+  none: "Нет оценки",
 };
 
 export const objects: ObjectItem[] = [
