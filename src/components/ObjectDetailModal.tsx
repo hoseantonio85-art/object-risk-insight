@@ -179,6 +179,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const evaluationStatus = localEvalStatus || obj.evaluationStatus || "actual";
   const evalInfo = evalStyleMap[evaluationStatus] || evalStyleMap.actual;
 
+  const isNoEvaluation = evaluationStatus === "none";
   const isNeedsReview = evaluationStatus === "needs-review";
   const isConfirmed = evaluationStatus === "actual" || accepted;
 
