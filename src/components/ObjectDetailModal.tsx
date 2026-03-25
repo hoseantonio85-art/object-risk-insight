@@ -337,13 +337,13 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
     </span>
   );
 
-  const titleRight = !isNoEvaluation && !isAiAnalysis ? <RiskBadge level={obj.riskLevel} /> : undefined;
+  const titleRight = obj.riskLevel !== "none" ? <RiskBadge level={obj.riskLevel} /> : undefined;
 
   // Description moved to body content area
 
-  const navigation = !isNoEvaluation && !isAiAnalysis ? (
+  const navigation = (
     <ModalNavChips sections={sections} activeSection={activeSection} onNavigate={scrollToSection} />
-  ) : undefined;
+  );
 
   const headerExtra = lifecycle === "planned" && obj.type === "product" ? (
     <div className="flex items-center justify-between gap-3 mt-2 rounded-xl border border-[hsl(var(--lifecycle-planned)/0.3)] bg-[hsl(var(--lifecycle-planned-bg))] px-4 py-3">
@@ -358,8 +358,17 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
     </div>
   ) : undefined;
 
-  const footer = !isNoEvaluation && !isAiAnalysis ? (
+  const footer = (
     <>
+      {isNoEvaluation && (
+        <button
+          onClick={() => setReEvalModalOpen(true)}
+          className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--brand-green))] text-[hsl(var(--brand-green-foreground))] px-4 py-2 text-sm font-medium hover:opacity-90 transition-all"
+        >
+          <FileText className="h-4 w-4" />
+          Оценить продукт
+        </button>
+      )}
       {isNeedsReview && !accepted && (
         <>
           <button
@@ -388,7 +397,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
         </button>
       )}
     </>
-  ) : undefined;
+  );
 
   /* ─── Body content based on state ─── */
   const renderBody = () => {
