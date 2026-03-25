@@ -81,6 +81,18 @@ const objectStatusLabels: Record<string, { label: string; className: string }> =
   none: { label: "Нет оценки", className: "bg-[hsl(var(--status-none-bg))] text-[hsl(var(--status-none))]" },
 };
 
+const evalStatusLabelsMap: Record<string, { label: string; className: string }> = {
+  "ai-analysis": { label: "AI анализ", className: "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]" },
+  "needs-review": { label: "Требует проверки", className: "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]" },
+  actual: { label: "Актуально", className: "bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))]" },
+};
+
+const lifecycleLabelsMap: Record<string, { label: string; className: string }> = {
+  planned: { label: "Планируемый", className: "bg-muted text-muted-foreground" },
+  active: { label: "Действующий", className: "bg-[hsl(var(--brand-green-bg))] text-[hsl(var(--brand-green))]" },
+  closed: { label: "Закрыт", className: "bg-muted text-muted-foreground" },
+};
+
 /* ─── Anchor nav sections ─── */
 const sections = [
   { id: "overview", label: "Обзор" },
@@ -151,7 +163,10 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   const previewManifestations = manifestationsData.slice(0, 3);
   const previewSources = sources.slice(0, 2);
-  const statusInfo = objectStatusLabels[obj.status] || objectStatusLabels.none;
+  const statusInfo = obj.type === "product" && obj.evaluationStatus
+    ? (evalStatusLabelsMap[obj.evaluationStatus] || evalStatusLabelsMap.actual)
+    : (objectStatusLabels[obj.status] || objectStatusLabels.none);
+  const lifecycleInfo = obj.lifecycle ? lifecycleLabelsMap[obj.lifecycle] : null;
 
   const setManifestationStatus = (idx: number, status: ManifestationStatus) => {
     setStatuses(prev => ({ ...prev, [idx]: status }));
@@ -168,6 +183,11 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground font-medium">{typeLabels[obj.type]}</span>
+                {lifecycleInfo && (
+                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleInfo.className)}>
+                    {lifecycleInfo.label}
+                  </span>
+                )}
                 <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", statusInfo.className)}>
                   {statusInfo.label}
                 </span>

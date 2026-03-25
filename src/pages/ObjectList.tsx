@@ -8,7 +8,7 @@ import { useModalStack } from "@/contexts/ModalStackContext";
 import { ProductEvaluationModal, type ProductEvaluationStartPayload } from "@/components/ProductEvaluationModal";
 import { InProgressProductModal } from "@/components/InProgressProductModal";
 import { ProductCard, DiscoveredProductPill } from "@/components/ProductCard";
-import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, manifestations, objects, assessmentHistory } from "@/data/mock";
+import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, manifestations, objects, assessmentHistory, type EvaluationStatus } from "@/data/mock";
 import { cn } from "@/lib/utils";
 
 const riskOptions: { value: RiskLevel | "all"; label: string }[] = [
@@ -18,12 +18,11 @@ const riskOptions: { value: RiskLevel | "all"; label: string }[] = [
   { value: "low", label: "Низкий" },
 ];
 
-const statusOptions: { value: AssessmentStatus | "all"; label: string }[] = [
+const evalStatusOptions: { value: EvaluationStatus | "all"; label: string }[] = [
   { value: "all", label: "Все статусы" },
   { value: "actual", label: "Актуально" },
-  { value: "progress", label: "В работе" },
-  { value: "stale", label: "Устарело" },
-  { value: "none", label: "Нет оценки" },
+  { value: "needs-review", label: "Требует проверки" },
+  { value: "ai-analysis", label: "AI анализ" },
 ];
 
 const typeConfig: Record<ObjectType, { title: string }> = {
@@ -33,13 +32,13 @@ const typeConfig: Record<ObjectType, { title: string }> = {
   "ai-agent": { title: "AI-агенты" },
 };
 
-type QuickFilter = "all" | "progress" | "high-risk" | "needs-action";
+type QuickFilter = "all" | "needs-review" | "high-risk" | "needs-action";
 
 const quickFilters: { value: QuickFilter; label: string }[] = [
   { value: "all", label: "Все" },
-  { value: "progress", label: "В работе" },
+  { value: "needs-review", label: "Требует проверки" },
   { value: "high-risk", label: "Высокий риск" },
-  { value: "needs-action", label: "Требует действий" },
+  { value: "needs-action", label: "Требует внимания" },
 ];
 
 interface InProgressProduct {
@@ -91,7 +90,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
 
   const [search, setSearch] = useState("");
   const [riskFilter, setRiskFilter] = useState<RiskLevel | "all">(initialRisk);
-  const [statusFilter, setStatusFilter] = useState<AssessmentStatus | "all">("all");
+  const [evalFilter, setEvalFilter] = useState<EvaluationStatus | "all">("all");
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [showEvalModal, setShowEvalModal] = useState(false);
   const [inProgress, setInProgress] = useState<InProgressProduct[]>([]);
@@ -151,6 +150,8 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
           status: "progress",
           lastAssessment: today,
           description: `Оценка продукта «${item.name}» завершена и ожидает подтверждения`,
+          lifecycle: "active",
+          evaluationStatus: "needs-review",
         });
 
         item.generatedManifestations.forEach((manifestation) => {
@@ -176,25 +177,25 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
   const items = useMemo(() => {
     let list = getObjectsByType(objectType);
     if (riskFilter !== "all") list = list.filter((o) => o.riskLevel === riskFilter);
-    if (statusFilter !== "all") list = list.filter((o) => o.status === statusFilter);
+    if (evalFilter !== "all") list = list.filter((o) => o.evaluationStatus === evalFilter);
     if (search) list = list.filter((o) => o.name.toLowerCase().includes(search.toLowerCase()));
 
     // Apply quick filters for products
     if (objectType === "product" && quickFilter !== "all") {
-      if (quickFilter === "progress") {
-        list = list.filter(o => o.status === "progress");
+      if (quickFilter === "needs-review") {
+        list = list.filter(o => o.evaluationStatus === "needs-review");
       } else if (quickFilter === "high-risk") {
         list = list.filter(o => o.riskLevel === "high");
       } else if (quickFilter === "needs-action") {
         list = list.filter(o => {
           const highManifestations = manifestations.filter(m => m.objectId === o.id && m.level === "high").length;
-          return o.status === "stale" || o.status === "none" || highManifestations > 0;
+          return o.evaluationStatus === "needs-review" || highManifestations > 0;
         });
       }
     }
 
     return list;
-  }, [objectType, riskFilter, statusFilter, search, quickFilter, inProgress]);
+  }, [objectType, riskFilter, evalFilter, search, quickFilter, inProgress]);
 
   const config = typeConfig[objectType];
   const isProductView = objectType === "product";
@@ -216,9 +217,9 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
             className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
             {riskOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)}
+          <select value={evalFilter} onChange={(e) => setEvalFilter(e.target.value as any)}
             className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
-            {statusOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {evalStatusOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
 
