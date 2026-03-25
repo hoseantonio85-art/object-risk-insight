@@ -28,11 +28,7 @@ export function InProgressProductModal({
         <div className="sticky top-0 z-10 flex items-center justify-between px-8 py-5 border-b border-border bg-card/95 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-lg bg-[hsl(var(--status-progress-bg))] flex items-center justify-center">
-              {product.done ? (
-                <Sparkles className="h-4.5 w-4.5 text-[hsl(var(--brand-green))]" />
-              ) : (
-                <Loader2 className="h-4.5 w-4.5 text-[hsl(var(--status-progress))] animate-spin" />
-              )}
+              <Loader2 className="h-4.5 w-4.5 text-[hsl(var(--status-progress))] animate-spin" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">{product.name}</h2>
