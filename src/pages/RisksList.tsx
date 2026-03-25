@@ -64,7 +64,7 @@ const mockRisks: RiskEntry[] = [
   // Behavior risks
   {
     id: "br1", code: "BHV-100001",
-    name: "Unauthorized enrollment",
+    name: "Подключение без ведома клиента",
     level: "high", status: "new", riskType: "behavior",
     potentialLoss: "—", actualLoss: "—", strategy: "Снизить",
     recommendations: 3, measures: 1,
@@ -72,7 +72,7 @@ const mockRisks: RiskEntry[] = [
   },
   {
     id: "br2", code: "BHV-100002",
-    name: "Unfair disclosure",
+    name: "Недобросовестное раскрытие информации",
     level: "medium", status: "new", riskType: "behavior",
     potentialLoss: "—", actualLoss: "—", strategy: "Снизить",
     recommendations: 2, measures: 0,
@@ -80,7 +80,7 @@ const mockRisks: RiskEntry[] = [
   },
   {
     id: "br4", code: "BHV-100004",
-    name: "Unsuitable product sale",
+    name: "Продажа неподходящего продукта",
     level: "high", status: "in_progress", riskType: "behavior",
     potentialLoss: "—", actualLoss: "—", strategy: "Избежать",
     recommendations: 2, measures: 1,

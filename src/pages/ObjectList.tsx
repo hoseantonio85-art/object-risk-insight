@@ -63,7 +63,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [showEvalModal, setShowEvalModal] = useState(false);
   const [inProgress, setInProgress] = useState<InProgressProduct[]>([]);
-  // removed activeInProgress state — in-progress cards now open the full product modal
+  const [activeAnalyzing, setActiveAnalyzing] = useState<InProgressProduct | null>(null);
 
   // Simulate progress
   useEffect(() => {
@@ -227,7 +227,15 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
             <InProgressProductCard
               key={i}
               product={p}
-              onClick={() => openObject("p5")}
+              onClick={() => {
+                if (p.done) {
+                  // "В работе" — open full product modal
+                  openObject("p5");
+                } else {
+                  // "AI анализ" — open lightweight analyzing modal
+                  setActiveAnalyzing(p);
+                }
+              }}
             />
           ))}
         </div>
@@ -251,6 +259,15 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
         <ProductEvaluationModal
           onClose={() => setShowEvalModal(false)}
           onStarted={handleEvaluationStarted}
+          zIndex={60}
+        />
+      )}
+
+      {/* In-progress analyzing modal */}
+      {activeAnalyzing && (
+        <InProgressProductModal
+          product={activeAnalyzing}
+          onClose={() => setActiveAnalyzing(null)}
           zIndex={60}
         />
       )}

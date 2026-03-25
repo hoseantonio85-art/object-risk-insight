@@ -60,11 +60,11 @@ export const risks: RiskItem[] = [
   { id: "r5", name: "Предвзятость AI-модели", level: "high", manifestations: 2, description: "Риск систематической ошибки или предвзятости в результатах работы AI-моделей, приводящей к дискриминации или некорректным решениям.", riskType: "operational" },
   { id: "r6", name: "Устаревание технологий", level: "low", manifestations: 2, description: "Риск использования устаревших технологий и фреймворков, что снижает безопасность и производительность.", riskType: "operational" },
   // Behavior risks
-  { id: "br1", name: "Unauthorized enrollment", level: "high", manifestations: 3, description: "Риск несанкционированного подключения клиентов к продуктам или услугам без их явного согласия. Включает автоматическую активацию подписок, платных опций или продуктов без подтверждения.", riskType: "behavior" },
-  { id: "br2", name: "Unfair disclosure", level: "medium", manifestations: 2, description: "Риск недостаточного или вводящего в заблуждение раскрытия информации о продукте, включая условия, тарифы, ограничения и риски.", riskType: "behavior" },
-  { id: "br3", name: "Tied selling", level: "low", manifestations: 1, description: "Риск навязывания дополнительных продуктов или услуг как обязательного условия для приобретения основного продукта.", riskType: "behavior" },
-  { id: "br4", name: "Unsuitable product sale", level: "high", manifestations: 2, description: "Риск продажи продуктов, не соответствующих потребностям, финансовому положению или уровню риска клиента.", riskType: "behavior" },
-  { id: "br5", name: "Product substitution", level: "none", manifestations: 0, description: "Риск подмены продукта — предоставление клиенту продукта, отличного от запрошенного или согласованного, без надлежащего уведомления.", riskType: "behavior" },
+  { id: "br1", name: "Подключение без ведома клиента", level: "high", manifestations: 3, description: "Риск несанкционированного подключения клиентов к продуктам или услугам без их явного согласия. Включает автоматическую активацию подписок, платных опций или продуктов без подтверждения.", riskType: "behavior" },
+  { id: "br2", name: "Недобросовестное раскрытие информации", level: "medium", manifestations: 2, description: "Риск недостаточного или вводящего в заблуждение раскрытия информации о продукте, включая условия, тарифы, ограничения и риски.", riskType: "behavior" },
+  { id: "br3", name: "Навязывание продуктов", level: "low", manifestations: 1, description: "Риск навязывания дополнительных продуктов или услуг как обязательного условия для приобретения основного продукта.", riskType: "behavior" },
+  { id: "br4", name: "Продажа неподходящего продукта", level: "high", manifestations: 2, description: "Риск продажи продуктов, не соответствующих потребностям, финансовому положению или уровню риска клиента.", riskType: "behavior" },
+  { id: "br5", name: "Подмена продукта", level: "none", manifestations: 0, description: "Риск подмены продукта — предоставление клиенту продукта, отличного от запрошенного или согласованного, без надлежащего уведомления.", riskType: "behavior" },
 ];
 
 export const manifestations: RiskManifestation[] = [
