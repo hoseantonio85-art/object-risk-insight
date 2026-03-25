@@ -7,7 +7,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { useModalStack } from "@/contexts/ModalStackContext";
 import { ProductEvaluationModal } from "@/components/ProductEvaluationModal";
 import { InProgressProductModal } from "@/components/InProgressProductModal";
-import { ProductCard, InProgressProductCard, DiscoveredProductPill } from "@/components/ProductCard";
+import { ProductCard, DiscoveredProductPill } from "@/components/ProductCard";
 import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, manifestations } from "@/data/mock";
 import { cn } from "@/lib/utils";
 
@@ -220,29 +220,23 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
         </div>
       </div>
 
-      {/* In-progress cards */}
-      {inProgress.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-up stagger-2">
-          {inProgress.map((p, i) => (
-            <InProgressProductCard
-              key={i}
-              product={p}
-              onClick={() => {
-                if (p.done) {
-                  // "В работе" — open full product modal
-                  openObject("p5");
-                } else {
-                  // "AI анализ" — open lightweight analyzing modal
-                  setActiveAnalyzing(p);
-                }
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Product cards grid */}
+      {/* All product cards in one grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-up stagger-2">
+        {inProgress.map((p, i) => (
+          <ProductCard
+            key={`ip-${i}`}
+            inProgressName={p.name}
+            inProgressProgress={p.progress}
+            inProgressDone={p.done}
+            onClick={() => {
+              if (p.done) {
+                openObject("p5");
+              } else {
+                setActiveAnalyzing(p);
+              }
+            }}
+          />
+        ))}
         {items.map((obj) => (
           <ProductCard key={obj.id} item={obj} onClick={() => openObject(obj.id)} />
         ))}
