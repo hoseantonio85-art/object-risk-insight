@@ -235,9 +235,25 @@ export function DetectedProductModal({
                 <h2 className="text-sm font-semibold text-foreground mb-1">
                   Этот продукт уже прорабатывался?
                 </h2>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground mb-4">
                   Можно привязать его к существующему или продолжить как новый.
                 </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowLinkDrawer(true)}
+                    className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3.5 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors"
+                  >
+                    <Link2 className="h-3.5 w-3.5" />
+                    Привязать к продукту
+                  </button>
+                  <button
+                    onClick={handleContinueAsNew}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--brand-green))] text-[hsl(var(--brand-green-foreground))] px-3.5 py-2 text-sm font-medium hover:opacity-90 transition-all"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    Продолжить как новый
+                  </button>
+                </div>
               </div>
             </div>
           </div>
