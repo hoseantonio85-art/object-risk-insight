@@ -10,7 +10,7 @@ import { VersionHistoryDrawer, type ProductVersion } from "@/components/VersionH
 import { ProductReEvaluationModal, type ReEvaluationStartPayload } from "@/components/ProductReEvaluationModal";
 import {
   objects, getManifestationsForObject, assessmentHistory, typeLabels, riskTypeLabels,
-  lifecycleLabels, evaluationStatusLabels,
+  lifecycleLabels, evaluationStatusLabels, manifestations,
   type ObjectItem, type RiskLevel
 } from "@/data/mock";
 import { cn } from "@/lib/utils";
@@ -209,6 +209,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   const handleReEvaluationStarted = (payload: ReEvaluationStartPayload) => {
     const newVersion = currentVersion + 1;
+    const wasNoEvaluation = isNoEvaluation;
     const triggerMap: Record<string, ProductVersion["trigger"]> = {
       "documents": "documents",
       "product-changes": "reassessment",
@@ -216,25 +217,37 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
       "manual": "reassessment",
     };
 
-    // Generate a believable new version with higher risk
+    const generatedRiskLevel: RiskLevel = wasNoEvaluation ? "high" : (obj.riskLevel === "medium" ? "high" : obj.riskLevel === "low" ? "medium" : "high");
+
+    // Mock manifestations to generate for first-time evaluation
+    const newManifestations: Array<{ riskId: string; level: RiskLevel; comment: string }> = wasNoEvaluation
+      ? [
+          { riskId: "br1", level: "high", comment: `В продукте «${obj.name}» обнаружено автоматическое подключение услуг без явного согласия клиента` },
+          { riskId: "r1", level: "high", comment: `Продукт «${obj.name}» обрабатывает персональные данные без достаточных мер защиты` },
+          { riskId: "br2", level: "medium", comment: `Условия использования продукта «${obj.name}» недостаточно прозрачно раскрыты в интерфейсе` },
+          { riskId: "r4", level: "medium", comment: `SLA продукта «${obj.name}» не соответствует целевому показателю доступности` },
+        ]
+      : [];
+
+    const totalRisks = wasNoEvaluation ? newManifestations.length : manifestationsData.length + Math.floor(Math.random() * 2) + 1;
+    const highRisks = wasNoEvaluation ? newManifestations.filter(m => m.level === "high").length : (manifestationsData.filter(m => m.level === "high").length) + 1;
+
     const newVersionData: ProductVersion = {
       version: newVersion,
       date: "25.03.2026",
       evaluationStatus: "ai-analysis",
-      riskLevel: obj.riskLevel === "medium" ? "high" : obj.riskLevel === "low" ? "medium" : "high",
-      totalRisks: manifestationsData.length + Math.floor(Math.random() * 2) + 1,
-      highRisks: (manifestationsData.filter(m => m.level === "high").length) + 1,
-      summary: "Переоценка в процессе. Выявлены новые факторы риска на основе загруженных документов.",
+      riskLevel: generatedRiskLevel,
+      totalRisks,
+      highRisks,
+      summary: "Анализ в процессе. Обработка загруженных документов.",
       trigger: triggerMap[payload.reason] || "documents",
     };
 
-    // Add new version to productVersions
     if (!productVersions[obj.id]) {
       productVersions[obj.id] = [];
     }
     productVersions[obj.id].unshift(newVersionData);
 
-    // Update the object's evaluation status
     const objIndex = objects.findIndex(o => o.id === objectId);
     if (objIndex !== -1) {
       objects[objIndex].evaluationStatus = "ai-analysis";
@@ -243,23 +256,56 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
     setAccepted(false);
 
     toast({
-      title: "Переоценка запущена",
+      title: "Анализ запущен",
       description: `Версия v${newVersion} — анализ начался.`,
     });
 
     // Simulate completion after delay
     setTimeout(() => {
+      const completionSummary = wasNoEvaluation
+        ? `Анализ продукта «${obj.name}» выявил ${totalRisks} проявлений рисков, из них ${highRisks} высокого уровня. Обнаружены поведенческие риски, связанные с прозрачностью условий и согласием клиентов.`
+        : (obj.riskLevel === "medium"
+          ? "Обнаружены новые проявления рисков после анализа обновлённых документов. Уровень риска повышен."
+          : "Подтверждены существующие проявления рисков. Выявлены дополнительные факторы, требующие внимания.");
+
       newVersionData.evaluationStatus = "needs-review";
-      newVersionData.summary = obj.riskLevel === "medium"
-        ? "Обнаружены новые проявления рисков после анализа обновлённых документов. Уровень риска повышен."
-        : "Подтверждены существующие проявления рисков. Выявлены дополнительные факторы, требующие внимания.";
+      newVersionData.summary = completionSummary;
       if (productVersions[obj.id]?.[0]?.version === newVersion) {
         productVersions[obj.id][0] = newVersionData;
       }
+
+      // Generate manifestations for first-time evaluation
+      if (wasNoEvaluation) {
+        newManifestations.forEach((m) => {
+          manifestations.unshift({
+            riskId: m.riskId,
+            objectId: obj.id,
+            level: m.level,
+            comment: m.comment,
+          });
+        });
+
+        // Add AI summary
+        aiSummaries[obj.id] = completionSummary;
+
+        // Add assessment history
+        assessmentHistory[obj.id] = [
+          { date: "2026-03-25", type: "AI", level: generatedRiskLevel },
+        ];
+
+        // Add sources
+        objectSources[obj.id] = [
+          { type: "document", title: "Загруженные документы", description: "Анализ документов, предоставленных пользователем", effect: `Выявлено ${totalRisks} проявлений рисков`, date: "25.03.2026" },
+          { type: "ai-agent", title: "NORM AI: поведенческий анализ", description: "Автоматическая проверка на соответствие стандартам поведения", effect: "Обнаружены поведенческие риски", date: "25.03.2026" },
+        ];
+      }
+
       const idx = objects.findIndex(o => o.id === objectId);
       if (idx !== -1) {
         objects[idx].evaluationStatus = "needs-review";
-        objects[idx].riskLevel = newVersionData.riskLevel;
+        objects[idx].riskLevel = generatedRiskLevel;
+        objects[idx].status = "progress";
+        objects[idx].lastAssessment = "2026-03-25";
       }
       setLocalEvalStatus("needs-review");
     }, 5000);
