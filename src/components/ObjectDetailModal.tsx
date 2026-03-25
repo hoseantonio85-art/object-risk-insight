@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { RiskBadge } from "@/components/RiskBadge";
+import { VersionHistoryDrawer, type ProductVersion } from "@/components/VersionHistoryDrawer";
 import {
   objects, getManifestationsForObject, assessmentHistory, typeLabels, riskTypeLabels,
   lifecycleLabels, evaluationStatusLabels,
