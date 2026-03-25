@@ -15,9 +15,9 @@ export const detectedProducts: DetectedProduct[] = [
     sourceHint: "Найден в документах",
   },
   {
-    id: "dp-2",
-    name: "Инвест-Консалт",
-    lifecycle: "planned",
+    id: "dp-3",
+    name: "Кэшбэк Плюс",
+    lifecycle: "active",
     sourceHint: "Найден в анализе",
   },
 ];
