@@ -55,6 +55,10 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
         label: "Оценка подтверждена",
         icon: <CheckCircle2 className="h-3 w-3 text-[hsl(var(--status-active))] shrink-0" />,
       },
+      none: {
+        label: "Нет оценки",
+        icon: <FileText className="h-3 w-3 text-[hsl(var(--status-none))] shrink-0" />,
+      },
     };
     evalLabel = map[status].label;
     evalIcon = map[status].icon;
