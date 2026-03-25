@@ -56,11 +56,7 @@ interface InProgressProduct {
   generatedManifestations: Array<{ riskId: string; level: RiskLevel; comment: string }>;
 }
 
-// Mock discovered products
-const discoveredProducts = ["SmartPay Lite", "Инвест-Консалт"];
-
-const generateProductId = () => `np-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
+// No longer needed - using detectedProducts from data file
 const createGeneratedManifestations = (productName: string): InProgressProduct["generatedManifestations"] => [
   {
     riskId: "br1",
