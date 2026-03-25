@@ -36,13 +36,8 @@ export function InProgressProductModal({
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">{product.name}</h2>
-              <span className={cn(
-                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium mt-0.5",
-                product.done
-                  ? "bg-[hsl(var(--brand-green-bg))] text-[hsl(var(--brand-green))]"
-                  : "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]"
-              )}>
-                {product.done ? "Готово" : "В работе"}
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium mt-0.5 bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]">
+                AI анализ
               </span>
             </div>
           </div>
