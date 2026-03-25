@@ -57,14 +57,15 @@ export function DetectedProductModal({
     });
   };
 
+  /* ─── Row 1: lifecycle chip (no risk for detected products) ─── */
   const statusChips = (
     <>
+      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[product.lifecycle])}>
+        {lifecycleLabels[product.lifecycle]}
+      </span>
       <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--brand-green)/0.15)] px-2 py-0.5 text-[10px] font-medium text-[hsl(var(--brand-green))]">
         <Sparkles className="h-2.5 w-2.5" />
         Обнаружен
-      </span>
-      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[product.lifecycle])}>
-        {lifecycleLabels[product.lifecycle]}
       </span>
     </>
   );
@@ -92,6 +93,48 @@ export function DetectedProductModal({
     </>
   );
 
+  /* ─── Right meta panel (mandatory, all fields with placeholders) ─── */
+  const metaSidebar = (
+    <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+      <h3 className="text-sm font-semibold text-foreground">Информация</h3>
+      <div className="space-y-2 text-xs">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Тип</span>
+          <span className="font-medium text-foreground">Продукт</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Жизненный цикл</span>
+          <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[product.lifecycle])}>
+            {lifecycleLabels[product.lifecycle]}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Дата создания</span>
+          <span className="text-foreground">—</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Последняя оценка</span>
+          <span className="text-foreground">—</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-muted-foreground">Статус оценки</span>
+          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium bg-[hsl(var(--brand-green)/0.15)] text-[hsl(var(--brand-green))]">
+            Ожидает решения
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Риски</span>
+          <span className="text-foreground">—</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Источник</span>
+          <span className="text-foreground">{product.sourceHint}</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  /* ─── Link drawer ─── */
   const linkDrawer = showLinkDrawer ? (
     <>
       <div
@@ -180,35 +223,7 @@ export function DetectedProductModal({
       footer={footer}
       drawers={linkDrawer}
     >
-      <ModalBody
-        sidebar={
-          <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">Информация</h3>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Тип</span>
-                <span className="font-medium text-foreground">Продукт</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Жизненный цикл</span>
-                <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[product.lifecycle])}>
-                  {lifecycleLabels[product.lifecycle]}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Источник</span>
-                <span className="text-foreground">{product.sourceHint}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Статус оценки</span>
-                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium bg-[hsl(var(--brand-green)/0.15)] text-[hsl(var(--brand-green))]">
-                  Ожидает решения
-                </span>
-              </div>
-            </div>
-          </div>
-        }
-      >
+      <ModalBody sidebar={metaSidebar}>
         {/* Decision Banner */}
         <section className="space-y-6">
           <div className="rounded-xl border border-[hsl(var(--brand-green)/0.3)] bg-[hsl(var(--brand-green-bg))] p-5">
