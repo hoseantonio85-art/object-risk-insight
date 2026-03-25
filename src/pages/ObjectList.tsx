@@ -360,6 +360,17 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
               objects[objIdx].evaluationStatus = "none";
               objects[objIdx].status = "none";
               objects[objIdx].riskLevel = "none";
+              objects[objIdx].lastAssessment = null;
+              // Clear existing manifestations for the linked product
+              const toRemove = manifestations.reduce<number[]>((acc, m, i) => {
+                if (m.objectId === existingId) acc.push(i);
+                return acc;
+              }, []);
+              for (let i = toRemove.length - 1; i >= 0; i--) {
+                manifestations.splice(toRemove[i], 1);
+              }
+              // Clear assessment history
+              delete assessmentHistory[existingId];
             }
             setDetected((prev) => prev.filter((d) => d.id !== detectedId));
             setActiveDetected(null);
