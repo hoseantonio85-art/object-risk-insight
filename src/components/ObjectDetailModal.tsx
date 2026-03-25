@@ -2,10 +2,11 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
   X, ChevronDown, Sparkles, Clock, Target,
   Scale, Newspaper, FileText, Bot, User, Info,
-  Check, XCircle, ArrowRight, ChevronRight, ShieldAlert, Trash2, RotateCcw, CheckCircle2
+  Check, XCircle, ArrowRight, ChevronRight, ShieldAlert, Trash2, RotateCcw, CheckCircle2, Loader2
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { RiskBadge } from "@/components/RiskBadge";
+import { Progress } from "@/components/ui/progress";
 import { VersionHistoryDrawer, type ProductVersion } from "@/components/VersionHistoryDrawer";
 import { ProductReEvaluationModal, type ReEvaluationStartPayload } from "@/components/ProductReEvaluationModal";
 import {
