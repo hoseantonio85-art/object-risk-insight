@@ -569,8 +569,12 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                 </div>
               </div>
 
-              <button className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity">
-                Запустить оценку
+              <button
+                onClick={() => setReEvalModalOpen(true)}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                <RotateCcw className="h-4 w-4" />
+                Запустить переоценку
               </button>
 
               {versions.length > 0 && (
