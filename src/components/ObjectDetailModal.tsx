@@ -81,6 +81,18 @@ const objectStatusLabels: Record<string, { label: string; className: string }> =
   none: { label: "Нет оценки", className: "bg-[hsl(var(--status-none-bg))] text-[hsl(var(--status-none))]" },
 };
 
+const evalStatusLabelsMap: Record<string, { label: string; className: string }> = {
+  "ai-analysis": { label: "AI анализ", className: "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]" },
+  "needs-review": { label: "Требует проверки", className: "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]" },
+  actual: { label: "Актуально", className: "bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))]" },
+};
+
+const lifecycleLabelsMap: Record<string, { label: string; className: string }> = {
+  planned: { label: "Планируемый", className: "bg-muted text-muted-foreground" },
+  active: { label: "Действующий", className: "bg-[hsl(var(--brand-green-bg))] text-[hsl(var(--brand-green))]" },
+  closed: { label: "Закрыт", className: "bg-muted text-muted-foreground" },
+};
+
 /* ─── Anchor nav sections ─── */
 const sections = [
   { id: "overview", label: "Обзор" },
