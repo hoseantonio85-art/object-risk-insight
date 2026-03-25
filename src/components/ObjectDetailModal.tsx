@@ -616,7 +616,10 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             </>
           )}
           {accepted && (
-            <button className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors">
+            <button
+              onClick={() => setReEvalModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors"
+            >
               <RotateCcw className="h-3.5 w-3.5" />
               Запустить переоценку
             </button>
