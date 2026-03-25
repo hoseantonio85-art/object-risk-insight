@@ -361,8 +361,8 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             </div>
           </div>
 
-          {/* Row 3: Navigation (hide when no evaluation) */}
-          {!isNoEvaluation && (
+          {/* Row 3: Navigation (hide when no evaluation or during analysis) */}
+          {!isNoEvaluation && !isAiAnalysis && (
             <div className="flex items-center gap-1.5 -mb-1">
               {sections.map(s => (
                 <button key={s.id} onClick={() => scrollToSection(s.id)}
