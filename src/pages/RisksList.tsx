@@ -64,7 +64,7 @@ const mockRisks: RiskEntry[] = [
   // Behavior risks
   {
     id: "br1", code: "BHV-100001",
-    name: "Unauthorized enrollment",
+    name: "Подключение без ведома клиента",
     level: "high", status: "new", riskType: "behavior",
     potentialLoss: "—", actualLoss: "—", strategy: "Снизить",
     recommendations: 3, measures: 1,
