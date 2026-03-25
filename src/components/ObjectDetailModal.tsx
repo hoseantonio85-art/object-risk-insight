@@ -599,6 +599,22 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               </div>
             </>
           )}
+
+          {/* Description — after alerts and AI summary */}
+          {obj.description && (
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold text-foreground">Описание продукта</h2>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <p className="text-sm text-foreground leading-relaxed line-clamp-3">{obj.description}</p>
+                <button
+                  onClick={() => setProductDetailsOpen(true)}
+                  className="mt-2 text-xs font-medium text-[hsl(var(--primary))] hover:underline transition-colors"
+                >
+                  Подробнее
+                </button>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ── MANIFESTATIONS ── */}
