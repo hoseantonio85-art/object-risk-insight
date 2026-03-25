@@ -167,6 +167,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   const versions = productVersions[obj.id] || [];
   const currentVersion = versions.length > 0 ? versions[0].version : 1;
+  const acceptedCount = Object.values(statuses).filter(s => s === "accepted").length;
   const previewManifestations = manifestationsData.slice(0, 3);
   const previewSources = sources.slice(0, 2);
 
