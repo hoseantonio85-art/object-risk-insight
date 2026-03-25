@@ -80,7 +80,7 @@ const mockRisks: RiskEntry[] = [
   },
   {
     id: "br4", code: "BHV-100004",
-    name: "Unsuitable product sale",
+    name: "Продажа неподходящего продукта",
     level: "high", status: "in_progress", riskType: "behavior",
     potentialLoss: "—", actualLoss: "—", strategy: "Избежать",
     recommendations: 2, measures: 1,
