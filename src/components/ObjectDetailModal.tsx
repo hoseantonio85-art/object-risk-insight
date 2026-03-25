@@ -195,6 +195,64 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
     onClose();
   };
 
+  const handleReEvaluationStarted = (payload: ReEvaluationStartPayload) => {
+    const newVersion = currentVersion + 1;
+    const triggerMap: Record<string, ProductVersion["trigger"]> = {
+      "documents": "documents",
+      "product-changes": "reassessment",
+      "law-news": "law",
+      "manual": "reassessment",
+    };
+
+    // Generate a believable new version with higher risk
+    const newVersionData: ProductVersion = {
+      version: newVersion,
+      date: "25.03.2026",
+      evaluationStatus: "ai-analysis",
+      riskLevel: obj.riskLevel === "medium" ? "high" : obj.riskLevel === "low" ? "medium" : "high",
+      totalRisks: manifestationsData.length + Math.floor(Math.random() * 2) + 1,
+      highRisks: (manifestationsData.filter(m => m.level === "high").length) + 1,
+      summary: "Переоценка в процессе. Выявлены новые факторы риска на основе загруженных документов.",
+      trigger: triggerMap[payload.reason] || "documents",
+    };
+
+    // Add new version to productVersions
+    if (!productVersions[obj.id]) {
+      productVersions[obj.id] = [];
+    }
+    productVersions[obj.id].unshift(newVersionData);
+
+    // Update the object's evaluation status
+    const objIndex = objects.findIndex(o => o.id === objectId);
+    if (objIndex !== -1) {
+      objects[objIndex].evaluationStatus = "ai-analysis";
+    }
+    setLocalEvalStatus("ai-analysis");
+    setAccepted(false);
+
+    toast({
+      title: "Переоценка запущена",
+      description: `Версия v${newVersion} — анализ начался.`,
+    });
+
+    // Simulate completion after delay
+    setTimeout(() => {
+      newVersionData.evaluationStatus = "needs-review";
+      newVersionData.summary = obj.riskLevel === "medium"
+        ? "Обнаружены новые проявления рисков после анализа обновлённых документов. Уровень риска повышен."
+        : "Подтверждены существующие проявления рисков. Выявлены дополнительные факторы, требующие внимания.";
+      if (productVersions[obj.id]?.[0]?.version === newVersion) {
+        productVersions[obj.id][0] = newVersionData;
+      }
+      const idx = objects.findIndex(o => o.id === objectId);
+      if (idx !== -1) {
+        objects[idx].evaluationStatus = "needs-review";
+        objects[idx].riskLevel = newVersionData.riskLevel;
+      }
+      setLocalEvalStatus("needs-review");
+    }, 5000);
+  };
+
   const setManifestationStatus = (idx: number, status: ManifestationStatus) => {
     setStatuses(prev => ({ ...prev, [idx]: status }));
   };
