@@ -391,8 +391,8 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               </button>
             </div>
           )}
+        </div>
 
-        {/* ── Scrollable Content ── */}
         <div ref={scrollRef} className="overflow-y-auto flex-1 no-scrollbar">
           {isNoEvaluation ? (
             /* ── Empty Evaluation State ── */
