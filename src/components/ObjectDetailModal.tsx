@@ -355,7 +355,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
           </div>
 
           {/* Row 2: Title + Risk badge */}
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-1">
             <h1 className="text-lg font-semibold text-foreground">{obj.name}</h1>
             <div className="flex items-center gap-3">
               {!isNoEvaluation && !isAiAnalysis && <RiskBadge level={obj.riskLevel} />}
@@ -364,6 +364,20 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               </button>
             </div>
           </div>
+
+          {/* Row 2b: Description snippet + "Подробнее" */}
+          {obj.description && (
+            <div className="flex items-start gap-2 mb-3">
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed flex-1">{obj.description}</p>
+              <button
+                onClick={() => setProductDetailsOpen(true)}
+                className="shrink-0 text-xs font-medium text-[hsl(var(--primary))] hover:underline transition-colors"
+              >
+                Подробнее
+              </button>
+            </div>
+          )}
+          {!obj.description && <div className="mb-3" />}
 
           {/* Row 3: Navigation (hide when no evaluation or during analysis) */}
           {!isNoEvaluation && !isAiAnalysis && (
