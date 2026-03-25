@@ -102,6 +102,8 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const [sourcesExpanded, setSourcesExpanded] = useState(false);
   const [statuses, setStatuses] = useState<Record<number, ManifestationStatus>>({});
   const [drawerItem, setDrawerItem] = useState<{ index: number; data: ReturnType<typeof getManifestationsForObject>[number] } | null>(null);
+  const [localEvalStatus, setLocalEvalStatus] = useState<string | null>(null);
+  const [accepted, setAccepted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
