@@ -129,6 +129,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const [accepted, setAccepted] = useState(false);
   const [versionDrawerOpen, setVersionDrawerOpen] = useState(false);
   const [reEvalModalOpen, setReEvalModalOpen] = useState(false);
+  const [localLifecycle, setLocalLifecycle] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
