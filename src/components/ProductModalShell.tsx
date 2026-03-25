@@ -12,15 +12,6 @@ export function ModalBody({ children, sidebar }: { children: React.ReactNode; si
   );
 }
 
-/* ─── Centered empty state helper ─── */
-export function ModalCenteredContent({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-center p-8 min-h-[400px]">
-      {children}
-    </div>
-  );
-}
-
 /* ─── Nav chips ─── */
 export function ModalNavChips({
   sections,
@@ -55,15 +46,11 @@ export function ModalNavChips({
 interface ProductModalShellProps {
   onClose: () => void;
   zIndex?: number;
-  /** Status chips (lifecycle, evaluation status, risk badge) */
+  /** Row 1: Status chips (lifecycle, risk level) */
   statusChips?: React.ReactNode;
-  /** Modal title */
+  /** Row 2: Modal title */
   title: string;
-  /** Right side of title row (risk badge, etc.) */
-  titleRight?: React.ReactNode;
-  /** Subtitle row (description snippet, "Подробнее" link) */
-  subtitle?: React.ReactNode;
-  /** Navigation chips row */
+  /** Row 3: Navigation chips row */
   navigation?: React.ReactNode;
   /** Extra header content (activation banner, etc.) */
   headerExtra?: React.ReactNode;
@@ -76,7 +63,7 @@ interface ProductModalShellProps {
 }
 
 export const ProductModalShell = forwardRef<HTMLDivElement, ProductModalShellProps>(
-  ({ onClose, zIndex = 50, statusChips, title, titleRight, subtitle, navigation, headerExtra, children, footer, drawers }, ref) => {
+  ({ onClose, zIndex = 50, statusChips, title, navigation, headerExtra, children, footer, drawers }, ref) => {
     return (
       <div className="fixed inset-0 flex items-start justify-center" style={{ zIndex }}>
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -84,33 +71,26 @@ export const ProductModalShell = forwardRef<HTMLDivElement, ProductModalShellPro
         <div className="relative z-10 w-full max-w-[1320px] max-h-[92vh] mt-[4vh] bg-background rounded-2xl shadow-2xl border border-border flex flex-col animate-in fade-in-0 zoom-in-95 duration-200">
           {/* ── Sticky Header ── */}
           <div className="sticky top-0 z-20 bg-background rounded-t-2xl border-b border-border px-8 py-4 shrink-0">
-            {/* Row 1: Status chips */}
+            {/* Row 1: Status chips (lifecycle + risk level) */}
             {statusChips && (
               <div className="flex items-center gap-2 mb-2">{statusChips}</div>
             )}
 
-            {/* Row 2: Title + right actions */}
-            <div className="flex items-center justify-between mb-1">
+            {/* Row 2: Title + close */}
+            <div className="flex items-center justify-between mb-3">
               <h1 className="text-lg font-semibold text-foreground">{title}</h1>
-              <div className="flex items-center gap-3">
-                {titleRight}
-                <button
-                  onClick={onClose}
-                  className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
+              <button
+                onClick={onClose}
+                className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
-            {/* Row 3: Subtitle (description) */}
-            {subtitle && <div className="mb-3">{subtitle}</div>}
-            {!subtitle && <div className="mb-3" />}
-
-            {/* Row 4: Navigation */}
+            {/* Row 3: Navigation */}
             {navigation}
 
-            {/* Row 5: Extra (activation banner, etc.) */}
+            {/* Extra (activation banner, etc.) */}
             {headerExtra}
           </div>
 
