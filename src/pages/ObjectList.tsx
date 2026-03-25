@@ -263,6 +263,15 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
         />
       )}
 
+      {/* In-progress analyzing modal */}
+      {activeAnalyzing && (
+        <InProgressProductModal
+          product={activeAnalyzing}
+          onClose={() => setActiveAnalyzing(null)}
+          zIndex={60}
+        />
+      )}
+
       </div>
   );
 }
