@@ -72,7 +72,7 @@ const mockRisks: RiskEntry[] = [
   },
   {
     id: "br2", code: "BHV-100002",
-    name: "Unfair disclosure",
+    name: "Недобросовестное раскрытие информации",
     level: "medium", status: "new", riskType: "behavior",
     potentialLoss: "—", actualLoss: "—", strategy: "Снизить",
     recommendations: 2, measures: 0,
