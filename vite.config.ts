@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
-  base: 'object-risk-insight',
+  base: mode === 'production' ? '/object-risk-insight/' : '/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
