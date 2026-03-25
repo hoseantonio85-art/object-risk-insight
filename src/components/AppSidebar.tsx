@@ -10,7 +10,7 @@ import {
   BookOpen,
   Package,
   Users,
-  FileText,
+  
   Bot,
   LayoutDashboard,
   ChevronDown,
