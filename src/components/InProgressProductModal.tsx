@@ -11,9 +11,10 @@ interface InProgressProduct {
   progress: number;
   done: boolean;
   documents: Array<{ name: string; sizeKb: number }>;
-  lifecycle?: ProductLifecycle;
+  lifecycle?: string;
   description?: string;
   createdDate?: string;
+  [key: string]: unknown;
 }
 
 const lifecycleStyleMap: Record<string, string> = {
