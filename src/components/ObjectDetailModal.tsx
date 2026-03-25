@@ -203,11 +203,14 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   const handleActivateProduct = () => {
     setLocalLifecycle("active");
+    setLocalEvalStatus("none");
     const objIndex = objects.findIndex(o => o.id === objectId);
     if (objIndex !== -1) {
       objects[objIndex].lifecycle = "active";
+      objects[objIndex].evaluationStatus = "none";
+      objects[objIndex].riskLevel = "none";
     }
-    toast({ title: "Продукт переведён в действующие", description: "Жизненный цикл продукта обновлён." });
+    toast({ title: "Продукт переведён в действующие", description: "Жизненный цикл продукта обновлён. Вы можете провести оценку рисков." });
   };
 
   const handleReEvaluationStarted = (payload: ReEvaluationStartPayload) => {
