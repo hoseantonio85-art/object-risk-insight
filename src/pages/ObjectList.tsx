@@ -6,6 +6,7 @@ import { RiskBadge } from "@/components/RiskBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useModalStack } from "@/contexts/ModalStackContext";
 import { ProductEvaluationModal } from "@/components/ProductEvaluationModal";
+import { InProgressProductModal } from "@/components/InProgressProductModal";
 import { ProductCard, InProgressProductCard, DiscoveredProductPill } from "@/components/ProductCard";
 import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, manifestations } from "@/data/mock";
 import { cn } from "@/lib/utils";
@@ -62,6 +63,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [showEvalModal, setShowEvalModal] = useState(false);
   const [inProgress, setInProgress] = useState<InProgressProduct[]>([]);
+  const [activeInProgress, setActiveInProgress] = useState<InProgressProduct | null>(null);
 
   // Simulate progress
   useEffect(() => {
@@ -225,12 +227,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
             <InProgressProductCard
               key={i}
               product={p}
-              onClick={() => {
-                // In-progress products are clickable — open modal with placeholder
-                if (p.done) {
-                  // Could open a product detail, for now show eval modal
-                }
-              }}
+              onClick={() => setActiveInProgress(p)}
             />
           ))}
         </div>
@@ -254,6 +251,14 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
         <ProductEvaluationModal
           onClose={() => setShowEvalModal(false)}
           onStarted={handleEvaluationStarted}
+          zIndex={60}
+        />
+      )}
+
+      {activeInProgress && (
+        <InProgressProductModal
+          product={activeInProgress}
+          onClose={() => setActiveInProgress(null)}
           zIndex={60}
         />
       )}
