@@ -204,14 +204,11 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   const handleActivateProduct = () => {
     setLocalLifecycle("active");
-    setLocalEvalStatus("none");
     const objIndex = objects.findIndex(o => o.id === objectId);
     if (objIndex !== -1) {
       objects[objIndex].lifecycle = "active";
-      objects[objIndex].evaluationStatus = "none";
-      objects[objIndex].riskLevel = "none";
     }
-    toast({ title: "Продукт переведён в действующие", description: "Жизненный цикл продукта обновлён. Вы можете провести оценку рисков." });
+    toast({ title: "Продукт переведён в действующие", description: "Жизненный цикл продукта обновлён." });
   };
 
   const handleReEvaluationStarted = (payload: ReEvaluationStartPayload) => {
@@ -471,14 +468,17 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
         {/* ── OVERVIEW ── */}
         <section ref={setSectionRef("overview")} className="space-y-6">
           {obj.description && (
-            <div className="rounded-xl border border-border bg-card p-5">
-              <p className="text-sm text-foreground leading-relaxed line-clamp-3">{obj.description}</p>
-              <button
-                onClick={() => setProductDetailsOpen(true)}
-                className="mt-2 text-xs font-medium text-[hsl(var(--primary))] hover:underline transition-colors"
-              >
-                Подробнее
-              </button>
+            <div className="space-y-3">
+              <h2 className="text-sm font-semibold text-foreground">Описание продукта</h2>
+              <div className="rounded-xl border border-border bg-card p-5">
+                <p className="text-sm text-foreground leading-relaxed line-clamp-3">{obj.description}</p>
+                <button
+                  onClick={() => setProductDetailsOpen(true)}
+                  className="mt-2 text-xs font-medium text-[hsl(var(--primary))] hover:underline transition-colors"
+                >
+                  Подробнее
+                </button>
+              </div>
             </div>
           )}
 
