@@ -483,15 +483,6 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                         <p className="text-xs text-[hsl(var(--status-active))/0.8] mb-0">
                           Результаты зафиксированы и учитываются в продукте.
                         </p>
-                        {lifecycle === "planned" && (
-                          <button
-                            onClick={handleActivateProduct}
-                            className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[hsl(var(--status-active))] text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
-                          >
-                            <ArrowRight className="h-3.5 w-3.5" />
-                            Перевести в действующие
-                          </button>
-                        )}
                       </div>
                     </div>
                   </div>
