@@ -147,11 +147,25 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const previewSources = sources.slice(0, 2);
 
   const lifecycle = obj.lifecycle || "active";
-  const evaluationStatus = obj.evaluationStatus || "actual";
+  const evaluationStatus = localEvalStatus || obj.evaluationStatus || "actual";
   const evalInfo = evalStyleMap[evaluationStatus] || evalStyleMap.actual;
 
-  const setManifestationStatus = (idx: number, status: ManifestationStatus) => {
-    setStatuses(prev => ({ ...prev, [idx]: status }));
+  const isNeedsReview = evaluationStatus === "needs-review";
+  const isConfirmed = evaluationStatus === "actual" || accepted;
+
+  const handleAcceptEvaluation = () => {
+    setLocalEvalStatus("actual");
+    setAccepted(true);
+    // Update the object in mock data
+    const objIndex = objects.findIndex(o => o.id === objectId);
+    if (objIndex !== -1) {
+      objects[objIndex].evaluationStatus = "actual";
+    }
+    toast({ title: "Оценка принята", description: "Оценка риска подтверждена и учтена в продукте." });
+  };
+
+  const handleDeleteEvaluation = () => {
+    onClose();
   };
 
   return (
