@@ -290,24 +290,26 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-lg font-semibold text-foreground">{obj.name}</h1>
             <div className="flex items-center gap-3">
-              <RiskBadge level={obj.riskLevel} />
+              {!isNoEvaluation && <RiskBadge level={obj.riskLevel} />}
               <button onClick={onClose} className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <X className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-          {/* Row 3: Navigation */}
-          <div className="flex items-center gap-1.5 -mb-1">
-            {sections.map(s => (
-              <button key={s.id} onClick={() => scrollToSection(s.id)}
-                className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-                  activeSection === s.id ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
-                )}>
-                {s.label}
-              </button>
-            ))}
-          </div>
+          {/* Row 3: Navigation (hide when no evaluation) */}
+          {!isNoEvaluation && (
+            <div className="flex items-center gap-1.5 -mb-1">
+              {sections.map(s => (
+                <button key={s.id} onClick={() => scrollToSection(s.id)}
+                  className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+                    activeSection === s.id ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
+                  )}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── Scrollable Content ── */}
