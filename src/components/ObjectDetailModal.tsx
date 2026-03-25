@@ -41,6 +41,27 @@ const sourceLabels: Record<SourceItem["type"], string> = {
   law: "Закон", news: "Новость", document: "Документ", "ai-agent": "AI агент", manual: "Ручная оценка",
 };
 
+/* ─── Mock: Product versions ─── */
+const productVersions: Record<string, ProductVersion[]> = {
+  p1: [
+    { version: 3, date: "15.03.2026", evaluationStatus: "actual", riskLevel: "high", totalRisks: 5, highRisks: 3, summary: "Обнаружены 3 проявления рисков высокого уровня после изменений в законодательстве.", trigger: "law" },
+    { version: 2, date: "10.01.2026", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 3, highRisks: 1, summary: "Выявлена уязвимость в механизмах шифрования. Уровень риска повышен.", trigger: "ai" },
+    { version: 1, date: "05.11.2025", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 2, highRisks: 0, summary: "Первичная оценка. Базовые риски идентифицированы.", trigger: "documents" },
+  ],
+  p2: [
+    { version: 2, date: "20.01.2026", evaluationStatus: "needs-review", riskLevel: "high", totalRisks: 4, highRisks: 2, summary: "Мобильное приложение использует устаревший API. Высокий приоритет обновления.", trigger: "news" },
+    { version: 1, date: "15.09.2025", evaluationStatus: "actual", riskLevel: "high", totalRisks: 3, highRisks: 2, summary: "Критические уязвимости в протоколе передачи данных.", trigger: "documents" },
+  ],
+  p3: [
+    { version: 2, date: "10.03.2026", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 3, highRisks: 0, summary: "SLA не соответствует целевому показателю 99.95%. Рекомендуется улучшение.", trigger: "reassessment" },
+    { version: 1, date: "20.12.2025", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 2, highRisks: 0, summary: "Базовая оценка платёжного шлюза. Средний уровень риска.", trigger: "documents" },
+  ],
+  p5: [
+    { version: 2, date: "28.02.2026", evaluationStatus: "needs-review", riskLevel: "high", totalRisks: 3, highRisks: 1, summary: "Неконтролируемый доступ аналитиков к сырым данным. Необходимо внедрить ролевую модель.", trigger: "ai" },
+    { version: 1, date: "15.01.2026", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 1, highRisks: 0, summary: "Первичная оценка рисков Data Lake.", trigger: "documents" },
+  ],
+};
+
 const objectSources: Record<string, SourceItem[]> = {
   p1: [
     { type: "law", title: "Ужесточение ФЗ-152 о персональных данных", description: "Новые требования к хранению и обработке ПДн", effect: "Обнаружены 2 новых проявления рисков", date: "15.03.2026" },
