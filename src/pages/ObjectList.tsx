@@ -6,7 +6,7 @@ import { RiskBadge } from "@/components/RiskBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useModalStack } from "@/contexts/ModalStackContext";
 import { ProductEvaluationModal, type ProductEvaluationStartPayload } from "@/components/ProductEvaluationModal";
-import { InProgressProductModal } from "@/components/InProgressProductModal";
+import { InProgressProductModal, type InProgressProduct } from "@/components/InProgressProductModal";
 import { ProductCard } from "@/components/ProductCard";
 import { DetectedProductCard } from "@/components/DetectedProductCard";
 import { DetectedProductModal } from "@/components/DetectedProductModal";
@@ -45,17 +45,7 @@ const quickFilters: { value: QuickFilter; label: string }[] = [
   { value: "needs-action", label: "Требует внимания" },
 ];
 
-interface InProgressProduct {
-  id: string;
-  name: string;
-  startedAt: number;
-  progress: number;
-  done: boolean;
-  lifecycle?: string;
-  launchDate?: string;
-  documents: Array<{ name: string; sizeKb: number }>;
-  generatedManifestations: Array<{ riskId: string; level: RiskLevel; comment: string }>;
-}
+/* InProgressProduct type is imported from InProgressProductModal */
 
 const generateProductId = () => `np-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 const createGeneratedManifestations = (productName: string): InProgressProduct["generatedManifestations"] => [
