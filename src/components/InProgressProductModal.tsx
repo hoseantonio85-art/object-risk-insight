@@ -1,10 +1,12 @@
 import { X, Loader2, Sparkles, FileText, Bot } from "lucide-react";
 
 interface InProgressProduct {
+  id: string;
   name: string;
   startedAt: number;
   progress: number;
   done: boolean;
+  documents: Array<{ name: string; sizeKb: number }>;
 }
 
 export function InProgressProductModal({
@@ -78,21 +80,29 @@ export function InProgressProductModal({
             </p>
           </div>
 
-          {/* Documents placeholder */}
+          {/* Documents */}
           <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
               <FileText className="h-4 w-4 text-muted-foreground" />
               Загруженные документы
             </h3>
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground py-1.5 px-3 rounded-lg bg-muted/50">
-                <FileText className="h-3.5 w-3.5" />
-                <span>Описание продукта.pdf</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground py-1.5 px-3 rounded-lg bg-muted/50">
-                <FileText className="h-3.5 w-3.5" />
-                <span>Тарифы и условия.xlsx</span>
-              </div>
+              {product.documents.length > 0 ? (
+                product.documents.map((document, index) => (
+                  <div key={`${document.name}-${index}`} className="flex items-center justify-between gap-2 text-xs text-muted-foreground py-1.5 px-3 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <FileText className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{document.name}</span>
+                    </div>
+                    <span className="tabular-nums shrink-0">{document.sizeKb} KB</span>
+                  </div>
+                ))
+              ) : (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground py-1.5 px-3 rounded-lg bg-muted/50">
+                  <FileText className="h-3.5 w-3.5" />
+                  <span>Документы не загружены</span>
+                </div>
+              )}
             </div>
           </div>
 
