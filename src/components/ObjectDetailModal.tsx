@@ -1,14 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
-  X, ChevronDown, Sparkles, Shield, Clock, Activity, Target,
-  CircleDot, Scale, Newspaper, FileText, Bot, User, Info,
-  AlertTriangle, Check, XCircle, ExternalLink, TrendingUp,
-  ArrowRight, ChevronRight, ShieldAlert
+  X, ChevronDown, Sparkles, Clock, Target,
+  Scale, Newspaper, FileText, Bot, User, Info,
+  Check, XCircle, ArrowRight, ChevronRight, ShieldAlert
 } from "lucide-react";
 import { RiskBadge } from "@/components/RiskBadge";
-import { StatusBadge } from "@/components/StatusBadge";
 import {
   objects, getManifestationsForObject, assessmentHistory, typeLabels, riskTypeLabels,
+  lifecycleLabels, evaluationStatusLabels,
   type ObjectItem, type RiskLevel
 } from "@/data/mock";
 import { cn } from "@/lib/utils";
@@ -57,40 +56,25 @@ const objectSources: Record<string, SourceItem[]> = {
   ],
 };
 
-/* ─── Mock: Change events ─── */
-interface ChangeEvent {
-  previousLevel: RiskLevel;
-  currentLevel: RiskLevel;
-}
-const changeEvents: Record<string, ChangeEvent> = {
-  p1: { previousLevel: "medium", currentLevel: "high" },
-  a2: { previousLevel: "medium", currentLevel: "high" },
-};
 const levelLabelsRu: Record<string, string> = {
   high: "Высокий", medium: "Средний", low: "Низкий", none: "Нет данных",
 };
 
-/* ─── Mock: Accepted manifestations state ─── */
+/* ─── Accepted manifestations state ─── */
 type ManifestationStatus = "pending" | "accepted" | "rejected";
 
-/* ─── Status labels ─── */
-const objectStatusLabels: Record<string, { label: string; className: string }> = {
-  actual: { label: "Актуально", className: "bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))]" },
-  stale: { label: "Устарело", className: "bg-[hsl(var(--status-stale-bg))] text-[hsl(var(--status-stale))]" },
-  progress: { label: "В работе", className: "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]" },
-  none: { label: "Нет оценки", className: "bg-[hsl(var(--status-none-bg))] text-[hsl(var(--status-none))]" },
+/* ─── Lifecycle style map ─── */
+const lifecycleStyleMap: Record<string, string> = {
+  planned: "bg-[hsl(var(--lifecycle-planned-bg))] text-[hsl(var(--lifecycle-planned))]",
+  active: "bg-[hsl(var(--lifecycle-active-bg))] text-[hsl(var(--lifecycle-active))]",
+  closed: "bg-[hsl(var(--lifecycle-closed-bg))] text-[hsl(var(--lifecycle-closed))]",
 };
 
-const evalStatusLabelsMap: Record<string, { label: string; className: string }> = {
+/* ─── Evaluation status style map ─── */
+const evalStyleMap: Record<string, { label: string; className: string }> = {
   "ai-analysis": { label: "AI анализ", className: "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]" },
-  "needs-review": { label: "Требует проверки", className: "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]" },
-  actual: { label: "Актуально", className: "bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))]" },
-};
-
-const lifecycleLabelsMap: Record<string, { label: string; className: string }> = {
-  planned: { label: "Планируемый", className: "bg-muted text-muted-foreground" },
-  active: { label: "Действующий", className: "bg-[hsl(var(--brand-green-bg))] text-[hsl(var(--brand-green))]" },
-  closed: { label: "Закрыт", className: "bg-muted text-muted-foreground" },
+  "needs-review": { label: "Анализ завершён", className: "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]" },
+  actual: { label: "Оценка подтверждена", className: "bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))]" },
 };
 
 /* ─── Anchor nav sections ─── */
@@ -153,20 +137,15 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const manifestationsData = getManifestationsForObject(obj.id);
   const history = assessmentHistory[obj.id] || [];
   const sources = objectSources[obj.id] || [];
-  const changeEvent = changeEvents[obj.id];
   const aiSummary = aiSummaries[obj.id] || `Объект ${obj.riskLevel === "high" ? "содержит критические" : obj.riskLevel === "medium" ? "содержит умеренные" : "не содержит значимых"} рисков.`;
 
-  const highCount = manifestationsData.filter(m => m.level === "high").length;
-  const mediumCount = manifestationsData.filter(m => m.level === "medium").length;
-  const lowCount = manifestationsData.filter(m => m.level === "low").length;
   const acceptedCount = Object.values(statuses).filter(s => s === "accepted").length;
-
   const previewManifestations = manifestationsData.slice(0, 3);
   const previewSources = sources.slice(0, 2);
-  const statusInfo = obj.type === "product" && obj.evaluationStatus
-    ? (evalStatusLabelsMap[obj.evaluationStatus] || evalStatusLabelsMap.actual)
-    : (objectStatusLabels[obj.status] || objectStatusLabels.none);
-  const lifecycleInfo = obj.lifecycle ? lifecycleLabelsMap[obj.lifecycle] : null;
+
+  const lifecycle = obj.lifecycle || "active";
+  const evaluationStatus = obj.evaluationStatus || "actual";
+  const evalInfo = evalStyleMap[evaluationStatus] || evalStyleMap.actual;
 
   const setManifestationStatus = (idx: number, status: ManifestationStatus) => {
     setStatuses(prev => ({ ...prev, [idx]: status }));
@@ -179,35 +158,29 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
       <div className="relative z-10 w-full max-w-[1320px] max-h-[92vh] mt-[4vh] bg-background rounded-2xl shadow-2xl border border-border flex flex-col animate-in fade-in-0 zoom-in-95 duration-200">
         {/* ── Sticky Header ── */}
         <div className="sticky top-0 z-20 bg-background rounded-t-2xl border-b border-border px-8 py-4 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground font-medium">{typeLabels[obj.type]}</span>
-                {lifecycleInfo && (
-                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleInfo.className)}>
-                    {lifecycleInfo.label}
-                  </span>
-                )}
-                <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", statusInfo.className)}>
-                  {statusInfo.label}
-                </span>
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-foreground">{obj.name}</h1>
-              </div>
-              <RiskBadge level={obj.riskLevel} />
-            </div>
+          {/* Row 1: Lifecycle + Evaluation status */}
+          <div className="flex items-center gap-2 mb-2">
+            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
+              {lifecycleLabels[lifecycle]}
+            </span>
+            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", evalInfo.className)}>
+              {evalInfo.label}
+            </span>
+          </div>
+
+          {/* Row 2: Title + Risk badge */}
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-lg font-semibold text-foreground">{obj.name}</h1>
             <div className="flex items-center gap-3">
-              {obj.lastAssessment && (
-                <span className="text-xs text-muted-foreground">Обновлён: {obj.lastAssessment}</span>
-              )}
+              <RiskBadge level={obj.riskLevel} />
               <button onClick={onClose} className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <X className="h-4 w-4" />
               </button>
             </div>
           </div>
-          {/* Sticky nav chips */}
-          <div className="flex items-center gap-1.5 mt-3 -mb-1">
+
+          {/* Row 3: Navigation */}
+          <div className="flex items-center gap-1.5 -mb-1">
             {sections.map(s => (
               <button key={s.id} onClick={() => scrollToSection(s.id)}
                 className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
@@ -244,7 +217,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                   </div>
                 )}
 
-                {/* AI Summary */}
+                {/* AI Summary — clean text only */}
                 <div className="rounded-xl border border-border bg-card p-5">
                   <div className="flex items-start gap-3">
                     <div className="h-8 w-8 rounded-lg bg-[hsl(270_60%_95%)] flex items-center justify-center shrink-0 mt-0.5">
@@ -255,32 +228,16 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                         <span className="text-xs font-medium text-muted-foreground">AI-сводка</span>
                       </div>
                       <p className="text-sm text-foreground leading-relaxed">{aiSummary}</p>
-                      {changeEvent && (
-                        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[hsl(38_92%_95%)] px-2.5 py-1 text-xs font-medium text-[hsl(38_92%_40%)]">
-                          <Activity className="h-3 w-3 text-[hsl(38_92%_50%)]" />
-                          Переоценён: {levelLabelsRu[changeEvent.previousLevel]} → {levelLabelsRu[changeEvent.currentLevel]}
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
 
-                {/* Summary strip */}
+                {/* Metrics strip — total risks + date only */}
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
                     <Target className="h-3 w-3 text-muted-foreground" />
                     Риски: {manifestationsData.length}
                   </div>
-                  {highCount > 0 && (
-                    <div className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--risk-high-bg))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--risk-high))]">
-                      Высокий: {highCount}
-                    </div>
-                  )}
-                  {mediumCount > 0 && (
-                    <div className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--risk-medium-bg))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--risk-medium))]">
-                      Средний: {mediumCount}
-                    </div>
-                  )}
                   {acceptedCount > 0 && (
                     <div className="inline-flex items-center gap-1.5 rounded-full bg-[hsl(var(--status-active-bg))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--status-active))]">
                       <Check className="h-3 w-3" />
@@ -296,19 +253,12 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
               {/* ── MANIFESTATIONS ── */}
               <section ref={setSectionRef("manifestations")} className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-sm font-semibold text-foreground">Проявления рисков</h2>
-                    <span className="text-xs text-muted-foreground">
-                      {manifestationsData.length > 0 ? `${manifestationsData.length} рисков` : ""}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-sm font-semibold text-foreground">Проявления рисков</h2>
                   {manifestationsData.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      {highCount > 0 && <span className="inline-flex items-center rounded-full bg-[hsl(var(--risk-high-bg))] text-[hsl(var(--risk-high))] px-2 py-0.5 text-xs font-medium">Высокий {highCount}</span>}
-                      {mediumCount > 0 && <span className="inline-flex items-center rounded-full bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))] px-2 py-0.5 text-xs font-medium">Средний {mediumCount}</span>}
-                      {lowCount > 0 && <span className="inline-flex items-center rounded-full bg-[hsl(var(--risk-low-bg))] text-[hsl(var(--risk-low))] px-2 py-0.5 text-xs font-medium">Низкий {lowCount}</span>}
-                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {manifestationsData.length} рисков
+                    </span>
                   )}
                 </div>
 
@@ -470,10 +420,30 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               <div className="rounded-xl border border-border bg-card p-5 space-y-3">
                 <h3 className="text-sm font-semibold text-foreground">Информация</h3>
                 <div className="space-y-2 text-xs">
-                  <div className="flex justify-between"><span className="text-muted-foreground">Тип</span><span className="font-medium text-foreground">{typeLabels[obj.type]}</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Статус</span><StatusBadge status={obj.status} /></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Последняя оценка</span><span className="text-foreground">{obj.lastAssessment ?? "—"}</span></div>
-                  <div className="flex justify-between"><span className="text-muted-foreground">Риски</span><span className="text-foreground">{manifestationsData.length}</span></div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Тип</span>
+                    <span className="font-medium text-foreground">{typeLabels[obj.type]}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Жизненный цикл</span>
+                    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
+                      {lifecycleLabels[lifecycle]}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Статус оценки</span>
+                    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", evalInfo.className)}>
+                      {evalInfo.label}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Последняя оценка</span>
+                    <span className="text-foreground">{obj.lastAssessment ?? "—"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Риски</span>
+                    <span className="text-foreground">{manifestationsData.length}</span>
+                  </div>
                 </div>
               </div>
 
@@ -484,7 +454,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               {history.length > 0 && (
                 <button className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-5 hover:shadow-sm transition-shadow">
                   <span className="text-sm font-medium text-foreground">История версий</span>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </button>
               )}
             </div>
@@ -504,18 +474,14 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
         {drawerItem && (() => {
           const m = drawerItem.data;
           const mStatus = statuses[drawerItem.index] || "pending";
-          const relatedSources = (objectSources[objectId] || []).filter(
-            s => s.title.toLowerCase().includes(m.risk.name.toLowerCase().split(" ")[0]) || true
-          ).slice(0, 2);
+          const relatedSources = (objectSources[objectId] || []).slice(0, 2);
 
           return (
             <>
-              {/* Drawer backdrop inside modal */}
               <div
                 className="absolute inset-0 z-30 bg-black/20 rounded-2xl transition-opacity duration-200"
                 onClick={() => setDrawerItem(null)}
               />
-              {/* Drawer panel */}
               <div className="absolute right-0 top-0 bottom-0 z-40 w-[440px] bg-background border-l border-border rounded-r-2xl shadow-2xl flex flex-col animate-in slide-in-from-right duration-200">
                 {/* Drawer header */}
                 <div className="px-5 py-4 border-b border-border shrink-0">
@@ -530,7 +496,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
                 {/* Drawer content */}
                 <div className="flex-1 overflow-y-auto p-5 space-y-5 no-scrollbar">
-                  {/* Level & contribution */}
+                  {/* Level & type */}
                   <div className="flex items-center gap-3 flex-wrap">
                     <RiskBadge level={m.level} />
                     {m.risk.riskType === "behavior" && (
@@ -539,9 +505,6 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                         Поведенческий
                       </span>
                     )}
-                    <span className="text-xs text-muted-foreground">
-                      Вклад: {m.level === "high" ? "45%" : m.level === "medium" ? "30%" : "15%"}
-                    </span>
                   </div>
 
                   {/* AI explanation */}
