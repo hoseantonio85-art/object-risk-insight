@@ -84,7 +84,7 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
         <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
           {lifecycleLabel}
         </span>
-        {item && <RiskBadge level={item.riskLevel} className="text-[10px] px-2 py-0" />}
+        {item && item.riskLevel !== "none" && <RiskBadge level={item.riskLevel} className="text-[10px] px-2 py-0" />}
       </div>
 
       {/* Row 2: name */}

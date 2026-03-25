@@ -203,11 +203,14 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   const handleActivateProduct = () => {
     setLocalLifecycle("active");
+    setLocalEvalStatus("none");
     const objIndex = objects.findIndex(o => o.id === objectId);
     if (objIndex !== -1) {
       objects[objIndex].lifecycle = "active";
+      objects[objIndex].evaluationStatus = "none";
+      objects[objIndex].riskLevel = "none";
     }
-    toast({ title: "Продукт переведён в действующие", description: "Жизненный цикл продукта обновлён." });
+    toast({ title: "Продукт переведён в действующие", description: "Жизненный цикл продукта обновлён. Вы можете провести оценку рисков." });
   };
 
   const handleReEvaluationStarted = (payload: ReEvaluationStartPayload) => {
@@ -374,27 +377,27 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               ))}
             </div>
           )}
+
+          {/* Activation banner for planned products */}
+          {lifecycle === "planned" && obj.type === "product" && (
+            <div className="flex items-center justify-between gap-3 mt-2 rounded-xl border border-[hsl(var(--lifecycle-planned)/0.3)] bg-[hsl(var(--lifecycle-planned-bg))] px-4 py-3">
+              <p className="text-xs text-foreground">Продукт в статусе «Планируемый». Активация не требует оценки рисков.</p>
+              <button
+                onClick={handleActivateProduct}
+                className="inline-flex items-center gap-1.5 shrink-0 rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2 text-sm font-medium hover:opacity-90 transition-all"
+              >
+                <ArrowRight className="h-3.5 w-3.5" />
+                Перевести в действующие
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* ── Scrollable Content ── */}
         <div ref={scrollRef} className="overflow-y-auto flex-1 no-scrollbar">
           {isNoEvaluation ? (
             /* ── Empty Evaluation State ── */
             <div className="flex items-center justify-center p-8 min-h-[400px]">
               <div className="max-w-md text-center space-y-4">
-                {/* Activate button for planned products */}
-                {lifecycle === "planned" && (
-                  <div className="rounded-xl border border-[hsl(var(--lifecycle-planned)/0.3)] bg-[hsl(var(--lifecycle-planned-bg))] p-4 mb-2">
-                    <p className="text-sm text-foreground mb-3">Продукт находится в статусе «Планируемый»</p>
-                    <button
-                      onClick={handleActivateProduct}
-                      className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-all"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                      Перевести в действующие
-                    </button>
-                  </div>
-                )}
                 <div className="mx-auto h-14 w-14 rounded-2xl bg-[hsl(var(--brand-green)/0.1)] flex items-center justify-center">
                   <FileText className="h-7 w-7 text-[hsl(var(--brand-green))]" />
                 </div>
@@ -480,15 +483,6 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                         <p className="text-xs text-[hsl(var(--status-active))/0.8] mb-0">
                           Результаты зафиксированы и учитываются в продукте.
                         </p>
-                        {lifecycle === "planned" && (
-                          <button
-                            onClick={handleActivateProduct}
-                            className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[hsl(var(--status-active))] text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
-                          >
-                            <ArrowRight className="h-3.5 w-3.5" />
-                            Перевести в действующие
-                          </button>
-                        )}
                       </div>
                     </div>
                   </div>
