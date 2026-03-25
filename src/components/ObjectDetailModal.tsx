@@ -399,153 +399,78 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
     </>
   );
 
-  /* ─── Body content based on state ─── */
+  /* ─── Shared meta sidebar ─── */
+  const metaSidebar = (
+    <>
+      <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+        <h3 className="text-sm font-semibold text-foreground">Информация</h3>
+        <div className="space-y-2 text-xs">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Тип</span>
+            <span className="font-medium text-foreground">{typeLabels[obj.type]}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Жизненный цикл</span>
+            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
+              {lifecycleLabels[lifecycle]}
+            </span>
+          </div>
+          {obj.createdDate && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Дата создания</span>
+              <span className="text-foreground">{obj.createdDate}</span>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Последняя оценка</span>
+            <span className="text-foreground">{obj.lastAssessment ?? "—"}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-muted-foreground">Статус оценки</span>
+            <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", evalInfo.className)}>
+              {evalInfo.label}
+            </span>
+          </div>
+          {!isNoEvaluation && !isAiAnalysis && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Риски</span>
+              <span className="text-foreground">{manifestationsData.length}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {!isAiAnalysis && (
+        <button
+          onClick={() => setReEvalModalOpen(true)}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
+        >
+          <RotateCcw className="h-4 w-4" />
+          {isNoEvaluation ? "Оценить продукт" : "Запустить переоценку"}
+        </button>
+      )}
+
+      {versions.length > 0 && (
+        <button
+          onClick={() => setVersionDrawerOpen(true)}
+          className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-5 hover:shadow-sm hover:border-[hsl(var(--primary)/0.3)] transition-all"
+        >
+          <div className="text-left">
+            <span className="text-sm font-medium text-foreground">История версий</span>
+            <p className="text-xs text-muted-foreground mt-0.5">v{currentVersion} · {versions.length} версий</p>
+          </div>
+          <Clock className="h-4 w-4 text-muted-foreground" />
+        </button>
+      )}
+    </>
+  );
+
+  /* ─── Body content — always two-column ─── */
   const renderBody = () => {
-    if (isNoEvaluation) {
-      return (
-        <ModalCenteredContent>
-          <div className="max-w-md text-center space-y-4">
-            <div className="mx-auto h-14 w-14 rounded-2xl bg-[hsl(var(--brand-green)/0.1)] flex items-center justify-center">
-              <FileText className="h-7 w-7 text-[hsl(var(--brand-green))]" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-base font-semibold text-foreground">Оценка не проводилась</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Загрузите документы, чтобы провести анализ рисков.
-              </p>
-              <p className="text-xs text-muted-foreground/70">
-                Оценка рисков ещё не проводилась. Это не означает отсутствие рисков.
-              </p>
-            </div>
-            <button
-              onClick={() => setReEvalModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--brand-green))] text-[hsl(var(--brand-green-foreground))] px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-all"
-            >
-              <FileText className="h-4 w-4" />
-              Оценить продукт
-            </button>
-          </div>
-        </ModalCenteredContent>
-      );
-    }
-
-    if (isAiAnalysis) {
-      return (
-        <ModalCenteredContent>
-          <div className="max-w-lg w-full text-center space-y-6">
-            <div className="mx-auto h-14 w-14 rounded-2xl bg-[hsl(270_60%_95%)] flex items-center justify-center">
-              <Loader2 className="h-7 w-7 text-[hsl(270_60%_50%)] animate-spin" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-base font-semibold text-foreground">AI анализирует документы</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Система проверяет загруженные документы на соответствие требованиям и выявляет потенциальные риски.
-              </p>
-            </div>
-            <div className="space-y-2 max-w-sm mx-auto">
-              <Progress value={Math.min(analysisProgress, 100)} className="h-2" />
-              <p className="text-xs text-muted-foreground">{Math.min(Math.round(analysisProgress), 100)}% завершено</p>
-            </div>
-            <div className="space-y-3 text-left max-w-sm mx-auto">
-              {[
-                { threshold: 20, label: "Извлечение данных из документов" },
-                { threshold: 50, label: "Анализ операционных рисков" },
-                { threshold: 80, label: "Проверка поведенческих рисков" },
-                { threshold: 100, label: "Формирование отчёта" },
-              ].map((step) => (
-                <div key={step.threshold} className="flex items-center gap-3">
-                  <div className={cn("h-5 w-5 rounded-full flex items-center justify-center shrink-0",
-                    analysisProgress > step.threshold ? "bg-[hsl(var(--status-active-bg))]" :
-                    analysisProgress > step.threshold - 30 ? "bg-muted" : "bg-muted/50"
-                  )}>
-                    {analysisProgress > step.threshold ? (
-                      <Check className="h-3 w-3 text-[hsl(var(--status-active))]" />
-                    ) : analysisProgress > step.threshold - 30 ? (
-                      <Loader2 className="h-3 w-3 text-muted-foreground animate-spin" />
-                    ) : (
-                      <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
-                    )}
-                  </div>
-                  <span className={cn("text-xs", analysisProgress > step.threshold - 30 ? "text-foreground" : "text-muted-foreground")}>
-                    {step.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </ModalCenteredContent>
-      );
-    }
-
-    // Evaluated state — two-column layout
     return (
-      <ModalBody
-        sidebar={
-          <>
-            <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">Информация</h3>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Тип</span>
-                  <span className="font-medium text-foreground">{typeLabels[obj.type]}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Жизненный цикл</span>
-                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
-                    {lifecycleLabels[lifecycle]}
-                  </span>
-                </div>
-                {obj.createdDate && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Дата создания</span>
-                    <span className="text-foreground">{obj.createdDate}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Последняя оценка</span>
-                  <span className="text-foreground">{obj.lastAssessment ?? "—"}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Статус оценки</span>
-                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", evalInfo.className)}>
-                    {evalInfo.label}
-                  </span>
-                </div>
-                {!isNoEvaluation && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Риски</span>
-                    <span className="text-foreground">{manifestationsData.length}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <button
-              onClick={() => setReEvalModalOpen(true)}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Запустить переоценку
-            </button>
-
-            {versions.length > 0 && (
-              <button
-                onClick={() => setVersionDrawerOpen(true)}
-                className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-5 hover:shadow-sm hover:border-[hsl(var(--primary)/0.3)] transition-all"
-              >
-                <div className="text-left">
-                  <span className="text-sm font-medium text-foreground">История версий</span>
-                  <p className="text-xs text-muted-foreground mt-0.5">v{currentVersion} · {versions.length} версий</p>
-                </div>
-                <Clock className="h-4 w-4 text-muted-foreground" />
-              </button>
-            )}
-          </>
-        }
-      >
+      <ModalBody sidebar={metaSidebar}>
         {/* ── OVERVIEW ── */}
         <section ref={setSectionRef("overview")} className="space-y-6">
-          {/* Description block */}
           {obj.description && (
             <div className="rounded-xl border border-border bg-card p-5">
               <p className="text-sm text-foreground leading-relaxed line-clamp-3">{obj.description}</p>
@@ -558,6 +483,71 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             </div>
           )}
 
+          {isNoEvaluation && (
+            <div className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
+              <div className="flex items-start gap-4">
+                <div className="h-10 w-10 rounded-xl bg-[hsl(var(--brand-green)/0.1)] flex items-center justify-center shrink-0">
+                  <FileText className="h-5 w-5 text-[hsl(var(--brand-green))]" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground mb-1">Оценка не проводилась</h2>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Загрузите документы, чтобы провести анализ рисков. Отсутствие оценки не означает отсутствие рисков.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isAiAnalysis && (
+            <div className="rounded-xl border border-border bg-card p-5 space-y-5">
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 rounded-lg bg-[hsl(270_60%_95%)] flex items-center justify-center shrink-0">
+                  <Loader2 className="h-4 w-4 text-[hsl(270_60%_50%)] animate-spin" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground mb-1">AI анализирует документы</h2>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Система проверяет загруженные документы на соответствие требованиям.
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Прогресс</span>
+                  <span className="text-xs font-medium text-foreground tabular-nums">{Math.min(Math.round(analysisProgress), 100)}%</span>
+                </div>
+                <Progress value={Math.min(analysisProgress, 100)} className="h-2" />
+              </div>
+              <div className="space-y-2">
+                {[
+                  { threshold: 20, label: "Извлечение данных из документов" },
+                  { threshold: 50, label: "Анализ операционных рисков" },
+                  { threshold: 80, label: "Проверка поведенческих рисков" },
+                  { threshold: 100, label: "Формирование отчёта" },
+                ].map((step) => (
+                  <div key={step.threshold} className="flex items-center gap-3">
+                    <div className={cn("h-5 w-5 rounded-full flex items-center justify-center shrink-0",
+                      analysisProgress > step.threshold ? "bg-[hsl(var(--status-active-bg))]" :
+                      analysisProgress > step.threshold - 30 ? "bg-muted" : "bg-muted/50"
+                    )}>
+                      {analysisProgress > step.threshold ? (
+                        <Check className="h-3 w-3 text-[hsl(var(--status-active))]" />
+                      ) : analysisProgress > step.threshold - 30 ? (
+                        <Loader2 className="h-3 w-3 text-muted-foreground animate-spin" />
+                      ) : (
+                        <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+                      )}
+                    </div>
+                    <span className={cn("text-xs", analysisProgress > step.threshold - 30 ? "text-foreground" : "text-muted-foreground")}>
+                      {step.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {accepted && (
             <div className="rounded-xl border border-[hsl(var(--status-active))/0.3] bg-[hsl(var(--status-active-bg))] p-4">
               <div className="flex items-start gap-3">
@@ -566,59 +556,58 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-[hsl(var(--status-active))] mb-0.5">Оценка риска подтверждена</p>
-                  <p className="text-xs text-[hsl(var(--status-active))/0.8] mb-0">
-                    Результаты зафиксированы и учитываются в продукте.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-          {sources.length > 0 && (
-            <div className="rounded-xl border border-[hsl(200_80%_85%)] bg-[hsl(200_80%_97%)] p-4">
-              <div className="flex items-start gap-3">
-                <div className="h-7 w-7 rounded-lg bg-[hsl(200_80%_90%)] flex items-center justify-center shrink-0 mt-0.5">
-                  <Info className="h-3.5 w-3.5 text-[hsl(200_80%_40%)]" />
-                </div>
-                <div>
-                  <p className="text-sm text-[hsl(200_80%_30%)]">
-                    Обнаружены риски на основе {sources.length > 1 ? `${sources.length} источников` : "1 источника"}.{" "}
-                    Вы можете принять или отклонить оценку.
-                  </p>
+                  <p className="text-xs text-[hsl(var(--status-active))/0.8]">Результаты зафиксированы и учитываются в продукте.</p>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="rounded-xl border border-border bg-card p-5">
-            <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-lg bg-[hsl(270_60%_95%)] flex items-center justify-center shrink-0 mt-0.5">
-                <Sparkles className="h-4 w-4 text-[hsl(270_60%_50%)]" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-xs font-medium text-muted-foreground">AI-сводка</span>
+          {!isNoEvaluation && !isAiAnalysis && (
+            <>
+              {sources.length > 0 && (
+                <div className="rounded-xl border border-[hsl(200_80%_85%)] bg-[hsl(200_80%_97%)] p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="h-7 w-7 rounded-lg bg-[hsl(200_80%_90%)] flex items-center justify-center shrink-0 mt-0.5">
+                      <Info className="h-3.5 w-3.5 text-[hsl(200_80%_40%)]" />
+                    </div>
+                    <p className="text-sm text-[hsl(200_80%_30%)]">
+                      Обнаружены риски на основе {sources.length > 1 ? `${sources.length} источников` : "1 источника"}.{" "}
+                      Вы можете принять или отклонить оценку.
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm text-foreground leading-relaxed">{aiSummary}</p>
-              </div>
-            </div>
-          </div>
+              )}
 
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
-              <Target className="h-3 w-3 text-muted-foreground" />
-              Риски: {manifestationsData.length}
-            </div>
-            {acceptedCount > 0 && (
-              <div className="inline-flex items-center gap-1.5 rounded-full bg-[hsl(var(--status-active-bg))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--status-active))]">
-                <Check className="h-3 w-3" />
-                Принято: {acceptedCount}
+              <div className="rounded-xl border border-border bg-card p-5">
+                <div className="flex items-start gap-3">
+                  <div className="h-8 w-8 rounded-lg bg-[hsl(270_60%_95%)] flex items-center justify-center shrink-0 mt-0.5">
+                    <Sparkles className="h-4 w-4 text-[hsl(270_60%_50%)]" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-medium text-muted-foreground mb-1.5 block">AI-сводка</span>
+                    <p className="text-sm text-foreground leading-relaxed">{aiSummary}</p>
+                  </div>
+                </div>
               </div>
-            )}
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
-              <Clock className="h-3 w-3" />
-              Оценка: {obj.lastAssessment ?? "не проводилась"}
-            </div>
-          </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
+                  <Target className="h-3 w-3 text-muted-foreground" />
+                  Риски: {manifestationsData.length}
+                </div>
+                {acceptedCount > 0 && (
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-[hsl(var(--status-active-bg))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--status-active))]">
+                    <Check className="h-3 w-3" />
+                    Принято: {acceptedCount}
+                  </div>
+                )}
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  Оценка: {obj.lastAssessment ?? "не проводилась"}
+                </div>
+              </div>
+            </>
+          )}
         </section>
 
         {/* ── MANIFESTATIONS ── */}
@@ -629,7 +618,6 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               <span className="text-xs text-muted-foreground">{manifestationsData.length} рисков</span>
             )}
           </div>
-
           {manifestationsData.length > 0 ? (
             <>
               <div className="space-y-2 transition-all duration-300">
@@ -644,9 +632,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                       <div className="flex items-start justify-between gap-4">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-medium text-foreground group-hover:text-[hsl(var(--primary))] transition-colors">
-                              {m.risk.name}
-                            </span>
+                            <span className="text-sm font-medium text-foreground group-hover:text-[hsl(var(--primary))] transition-colors">{m.risk.name}</span>
                             <RiskBadge level={m.level} />
                             {m.risk.riskType === "behavior" && (
                               <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(270_60%_95%)] text-[hsl(270_60%_40%)] px-1.5 py-0.5 text-[10px] font-medium">
@@ -658,19 +644,9 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                           <p className="text-xs text-muted-foreground">{m.comment}</p>
                         </div>
                         <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
-                          {mStatus === "pending" && (
-                            <span className="text-xs text-muted-foreground">На рассмотрении</span>
-                          )}
-                          {mStatus === "accepted" && (
-                            <span className="inline-flex items-center gap-1 text-xs text-[hsl(var(--status-active))]">
-                              <Check className="h-3 w-3" /> Принято
-                            </span>
-                          )}
-                          {mStatus === "rejected" && (
-                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                              <XCircle className="h-3 w-3" /> Отклонено
-                            </span>
-                          )}
+                          {mStatus === "pending" && <span className="text-xs text-muted-foreground">На рассмотрении</span>}
+                          {mStatus === "accepted" && <span className="inline-flex items-center gap-1 text-xs text-[hsl(var(--status-active))]"><Check className="h-3 w-3" /> Принято</span>}
+                          {mStatus === "rejected" && <span className="inline-flex items-center gap-1 text-xs text-muted-foreground"><XCircle className="h-3 w-3" /> Отклонено</span>}
                           <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
                         </div>
                       </div>
@@ -687,8 +663,10 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               )}
             </>
           ) : (
-            <div className="rounded-xl border border-border bg-card p-5 text-center">
-              <p className="text-sm text-muted-foreground">Проявления рисков не обнаружены</p>
+            <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
+              <p className="text-sm text-muted-foreground">
+                {isNoEvaluation || isAiAnalysis ? "Проявления появятся после завершения анализа" : "Проявления рисков не обнаружены"}
+              </p>
             </div>
           )}
         </section>
@@ -730,7 +708,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               )}
             </>
           ) : (
-            <div className="rounded-xl border border-border bg-card p-5 text-center">
+            <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
               <p className="text-sm text-muted-foreground">Источники не найдены</p>
             </div>
           )}
@@ -740,9 +718,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
         <section ref={setSectionRef("context")} className="space-y-3">
           <h2 className="text-sm font-semibold text-foreground">Контекст</h2>
           <div className="rounded-xl border border-border bg-card p-5">
-            <p className="text-sm text-foreground leading-relaxed">
-              {obj.description || "Описание объекта не указано."}
-            </p>
+            <p className="text-sm text-foreground leading-relaxed">{obj.description || "Описание объекта не указано."}</p>
           </div>
         </section>
 
@@ -760,7 +736,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border border-border bg-card p-5 text-center">
+            <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
               <p className="text-sm text-muted-foreground">Оценки ещё не проводились</p>
             </div>
           )}
