@@ -1,23 +1,15 @@
-import { Loader2, Sparkles, AlertTriangle, CheckCircle2, ArrowRight } from "lucide-react";
+import { Loader2, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
 import { RiskBadge } from "@/components/RiskBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { ObjectItem, manifestations, lifecycleLabels, evaluationStatusLabels, type EvaluationStatus, type ProductLifecycle } from "@/data/mock";
+import { ObjectItem, manifestations, lifecycleLabels, type EvaluationStatus, type ProductLifecycle } from "@/data/mock";
 
 interface ProductCardProps {
   item?: ObjectItem;
-  /** For in-progress products without a real ObjectItem */
   inProgressName?: string;
   inProgressProgress?: number;
   inProgressDone?: boolean;
   onClick: () => void;
-}
-
-/** Compute attention flag independently from status */
-function needsAttentionFlag(item: ObjectItem): boolean {
-  const itemManifestations = manifestations.filter(m => m.objectId === item.id);
-  const highRisks = itemManifestations.filter(m => m.level === "high").length;
-  return highRisks > 0 || item.evaluationStatus === "needs-review";
 }
 
 export function ProductCard({ item, inProgressName, inProgressProgress = 0, inProgressDone = false, onClick }: ProductCardProps) {
@@ -25,70 +17,50 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
   const isAnalyzing = isInProgress && !inProgressDone;
   const isReady = isInProgress && inProgressDone;
 
-  // For real items
-  const itemManifestations = item ? manifestations.filter(m => m.objectId === item.id) : [];
-  const totalRisks = item ? itemManifestations.length : 0;
-  const highRisks = item ? itemManifestations.filter(m => m.level === "high").length : 0;
-  const mediumRisks = item ? itemManifestations.filter(m => m.level === "medium").length : 0;
+  // Risks
+  const totalRisks = item ? manifestations.filter(m => m.objectId === item.id).length : 0;
 
-  // Lifecycle label
+  // Lifecycle
   const lifecycle: ProductLifecycle = item?.lifecycle || "active";
   const lifecycleLabel = lifecycleLabels[lifecycle];
 
-  // Evaluation status
-  let evalStatus: EvaluationStatus;
-  let evalStatusLabel: string;
-  let evalStatusClassName: string;
-
-  if (isAnalyzing) {
-    evalStatus = "ai-analysis";
-    evalStatusLabel = "AI анализ";
-    evalStatusClassName = "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]";
-  } else if (isReady) {
-    evalStatus = "needs-review";
-    evalStatusLabel = "Требует проверки";
-    evalStatusClassName = "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]";
-  } else if (item) {
-    evalStatus = item.evaluationStatus || "actual";
-    evalStatusLabel = evaluationStatusLabels[evalStatus];
-    const evalStyleMap: Record<EvaluationStatus, string> = {
-      "ai-analysis": "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]",
-      "needs-review": "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]",
-      actual: "bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))]",
-    };
-    evalStatusClassName = evalStyleMap[evalStatus];
-  } else {
-    evalStatus = "ai-analysis";
-    evalStatusLabel = "";
-    evalStatusClassName = "";
-  }
-
-  // Attention flag (separate from status)
-  const hasAttention = item ? needsAttentionFlag(item) : isReady;
-
-  // Lifecycle style
   const lifecycleStyleMap: Record<ProductLifecycle, string> = {
-    planned: "bg-muted text-muted-foreground",
-    active: "bg-[hsl(var(--brand-green-bg))] text-[hsl(var(--brand-green))]",
-    closed: "bg-muted text-muted-foreground",
+    planned: "bg-[hsl(var(--lifecycle-planned-bg))] text-[hsl(var(--lifecycle-planned))]",
+    active: "bg-[hsl(var(--lifecycle-active-bg))] text-[hsl(var(--lifecycle-active))]",
+    closed: "bg-[hsl(var(--lifecycle-closed-bg))] text-[hsl(var(--lifecycle-closed))]",
   };
 
-  // Activity hint
-  let activityHint: string;
+  // Evaluation status
+  let evalLabel: string;
+  let evalIcon: React.ReactNode;
+
   if (isAnalyzing) {
-    activityHint = "Идёт анализ документов";
+    evalLabel = "AI анализ";
+    evalIcon = <Loader2 className="h-3 w-3 text-[hsl(var(--status-progress))] animate-spin shrink-0" />;
   } else if (isReady) {
-    activityHint = "Анализ завершён — проверьте результаты";
+    evalLabel = "Анализ завершён";
+    evalIcon = <Sparkles className="h-3 w-3 text-[hsl(var(--risk-medium))] shrink-0" />;
   } else if (item) {
-    activityHint = evalStatus === "ai-analysis"
-      ? "Анализируется"
-      : highRisks > 0
-        ? `Обнаружены высокие риски (${highRisks})`
-        : evalStatus === "needs-review"
-          ? "Ожидает проверки"
-          : "Оценка завершена";
+    const status = item.evaluationStatus || "actual";
+    const map: Record<EvaluationStatus, { label: string; icon: React.ReactNode }> = {
+      "ai-analysis": {
+        label: "AI анализ",
+        icon: <Loader2 className="h-3 w-3 text-[hsl(var(--status-progress))] animate-spin shrink-0" />,
+      },
+      "needs-review": {
+        label: "Анализ завершён",
+        icon: <Sparkles className="h-3 w-3 text-[hsl(var(--risk-medium))] shrink-0" />,
+      },
+      actual: {
+        label: "Оценка подтверждена",
+        icon: <CheckCircle2 className="h-3 w-3 text-[hsl(var(--status-active))] shrink-0" />,
+      },
+    };
+    evalLabel = map[status].label;
+    evalIcon = map[status].icon;
   } else {
-    activityHint = "";
+    evalLabel = "";
+    evalIcon = null;
   }
 
   const name = item?.name || inProgressName || "";
@@ -100,80 +72,42 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
       className={cn(
         "group w-full rounded-xl border bg-card p-4 text-left cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-        isAnalyzing
-          ? "border-[hsl(var(--status-progress)/0.3)] opacity-90"
-          : hasAttention && !isReady
-            ? "border-[hsl(var(--risk-medium)/0.3)]"
-            : isReady
-              ? "border-[hsl(var(--risk-medium)/0.3)]"
-              : "border-border"
+        isAnalyzing ? "border-[hsl(var(--status-progress)/0.3)] opacity-90" : "border-border"
       )}
     >
-      {/* Header: lifecycle + name + eval status */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-1">
-            <span className={cn("inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-medium", lifecycleStyleMap[lifecycle])}>
-              {lifecycleLabel}
-            </span>
-            {hasAttention && !isAnalyzing && (
-              <span className="inline-flex items-center gap-0.5 text-[9px] font-medium text-[hsl(var(--risk-medium))]">
-                <AlertTriangle className="h-2.5 w-2.5" />
-                Внимание
-              </span>
-            )}
-          </div>
-          <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-[hsl(var(--brand-green))] transition-colors">
-            {name}
-          </h3>
-        </div>
-        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ml-2", evalStatusClassName)}>
-          {evalStatusLabel}
+      {/* Row 1: lifecycle + risk level */}
+      <div className="flex items-center justify-between mb-2.5">
+        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
+          {lifecycleLabel}
         </span>
+        {item && <RiskBadge level={item.riskLevel} className="text-[10px] px-2 py-0" />}
       </div>
 
-      {/* Risks block */}
+      {/* Row 2: name */}
+      <h3 className="text-sm font-semibold text-foreground truncate mb-2.5 group-hover:text-[hsl(var(--brand-green))] transition-colors">
+        {name}
+      </h3>
+
+      {/* Row 3: risks count + date */}
       {isAnalyzing ? (
-        <div className="mb-3 space-y-1.5">
-          <Skeleton className="h-3 w-28" />
-          <Skeleton className="h-3 w-20" />
-        </div>
-      ) : totalRisks > 0 || isReady ? (
-        <div className="flex items-center gap-3 mb-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">Риски:</span>
-            <span className="text-xs font-semibold text-foreground">{isReady ? "—" : totalRisks}</span>
-          </div>
-          {highRisks > 0 && (
-            <div className="flex items-center gap-1.5">
-              <AlertTriangle className="h-3 w-3 text-[hsl(var(--risk-high))]" />
-              <span className="text-xs font-semibold text-[hsl(var(--risk-high))]">
-                Высокие: {highRisks}
-              </span>
-            </div>
-          )}
-          {mediumRisks > 0 && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold text-[hsl(var(--risk-medium))]">
-                Средние: {mediumRisks}
-              </span>
-            </div>
-          )}
-          {item && <RiskBadge level={item.riskLevel} className="ml-auto text-[10px] px-2 py-0" />}
-          {isReady && (
-            <span className="text-[10px] text-muted-foreground ml-auto">Требует проверки</span>
-          )}
+        <div className="mb-2.5 space-y-1.5">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-16" />
         </div>
       ) : (
-        <div className="flex items-center gap-1.5 mb-3">
-          <span className="text-xs text-muted-foreground">Риски не обнаружены</span>
-          {item && <RiskBadge level={item.riskLevel} className="ml-auto text-[10px] px-2 py-0" />}
+        <div className="flex items-center gap-4 mb-2.5 text-xs text-muted-foreground">
+          <span>
+            Риски: <span className="font-semibold text-foreground">{isReady ? "—" : totalRisks}</span>
+          </span>
+          {item?.lastAssessment && (
+            <span className="tabular-nums">Оценка: {item.lastAssessment}</span>
+          )}
         </div>
       )}
 
-      {/* Progress bar for analyzing state */}
+      {/* Progress bar for analyzing */}
       {isAnalyzing && (
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3 mb-2.5">
           <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
             <div
               className="h-full rounded-full bg-[hsl(var(--status-progress))] transition-all duration-700 ease-out"
@@ -186,25 +120,10 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
         </div>
       )}
 
-      {/* Last assessment date */}
-      {item?.lastAssessment && (
-        <div className="flex items-center gap-2 text-[11px] text-muted-foreground mb-2">
-          <span>Оценка: {item.lastAssessment}</span>
-        </div>
-      )}
-
-      {/* Footer: activity hint */}
+      {/* Row 4: evaluation status */}
       <div className="flex items-center gap-1.5 pt-2 border-t border-border">
-        {isAnalyzing ? (
-          <Loader2 className="h-3 w-3 text-[hsl(var(--status-progress))] animate-spin shrink-0" />
-        ) : highRisks > 0 ? (
-          <AlertTriangle className="h-3 w-3 text-[hsl(var(--risk-high))] shrink-0" />
-        ) : evalStatus === "actual" ? (
-          <CheckCircle2 className="h-3 w-3 text-[hsl(var(--status-active))] shrink-0" />
-        ) : (
-          <Sparkles className="h-3 w-3 text-[hsl(var(--status-progress))] shrink-0" />
-        )}
-        <span className="text-[11px] text-muted-foreground truncate">{activityHint}</span>
+        {evalIcon}
+        <span className="text-[11px] text-muted-foreground truncate">{evalLabel}</span>
         <ArrowRight className="h-3 w-3 text-muted-foreground/50 ml-auto shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
     </button>
