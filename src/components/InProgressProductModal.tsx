@@ -106,12 +106,10 @@ export function InProgressProductModal({
             <div className="text-center">
               <Sparkles className="h-8 w-8 text-muted-foreground/40 mx-auto mb-3" />
               <p className="text-sm font-medium text-muted-foreground">
-                {product.done ? "Проявления рисков готовы к просмотру" : "Проявления рисков появятся здесь"}
+                Результаты появятся после завершения анализа
               </p>
               <p className="text-xs text-muted-foreground/70 mt-1">
-                {product.done
-                  ? "Откройте полную карточку продукта для просмотра результатов"
-                  : "После завершения анализа здесь появятся обнаруженные проявления рисков"}
+                После завершения анализа здесь появятся обнаруженные проявления рисков
               </p>
             </div>
           </div>
