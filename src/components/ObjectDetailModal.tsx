@@ -163,7 +163,10 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   const previewManifestations = manifestationsData.slice(0, 3);
   const previewSources = sources.slice(0, 2);
-  const statusInfo = objectStatusLabels[obj.status] || objectStatusLabels.none;
+  const statusInfo = obj.type === "product" && obj.evaluationStatus
+    ? (evalStatusLabelsMap[obj.evaluationStatus] || evalStatusLabelsMap.actual)
+    : (objectStatusLabels[obj.status] || objectStatusLabels.none);
+  const lifecycleInfo = obj.lifecycle ? lifecycleLabelsMap[obj.lifecycle] : null;
 
   const setManifestationStatus = (idx: number, status: ManifestationStatus) => {
     setStatuses(prev => ({ ...prev, [idx]: status }));
@@ -180,6 +183,11 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground font-medium">{typeLabels[obj.type]}</span>
+                {lifecycleInfo && (
+                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleInfo.className)}>
+                    {lifecycleInfo.label}
+                  </span>
+                )}
                 <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium", statusInfo.className)}>
                   {statusInfo.label}
                 </span>
