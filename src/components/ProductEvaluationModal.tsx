@@ -4,9 +4,16 @@ import { cn } from "@/lib/utils";
 
 type ModalStep = "upload" | "started";
 
+export interface ProductEvaluationStartPayload {
+  productName: string;
+  lifecycle?: string;
+  launchDate?: string;
+  files: Array<{ name: string; sizeKb: number }>;
+}
+
 interface ProductEvaluationModalProps {
   onClose: () => void;
-  onStarted: (productName: string) => void;
+  onStarted: (payload: ProductEvaluationStartPayload) => void;
   zIndex?: number;
 }
 
@@ -48,7 +55,15 @@ export function ProductEvaluationModal({ onClose, onStarted, zIndex = 50 }: Prod
 
   const handleClose = () => {
     if (step === "started" && productName.trim()) {
-      onStarted(productName.trim());
+      onStarted({
+        productName: productName.trim(),
+        lifecycle: lifecycle || undefined,
+        launchDate: launchDate || undefined,
+        files: files.map((file) => ({
+          name: file.name,
+          sizeKb: Math.max(1, Math.round(file.size / 1024)),
+        })),
+      });
     }
     onClose();
   };

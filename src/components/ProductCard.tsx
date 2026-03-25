@@ -22,6 +22,7 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
   const itemManifestations = item ? manifestations.filter(m => m.objectId === item.id) : [];
   const totalRisks = item ? itemManifestations.length : 0;
   const highRisks = item ? itemManifestations.filter(m => m.level === "high").length : 0;
+  const mediumRisks = item ? itemManifestations.filter(m => m.level === "medium").length : 0;
 
   // Determine status
   let statusLabel: string;
@@ -116,6 +117,13 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
               <AlertTriangle className="h-3 w-3 text-[hsl(var(--risk-high))]" />
               <span className="text-xs font-semibold text-[hsl(var(--risk-high))]">
                 Высокие: {highRisks}
+              </span>
+            </div>
+          )}
+          {mediumRisks > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-[hsl(var(--risk-medium))]">
+                Средние: {mediumRisks}
               </span>
             </div>
           )}
