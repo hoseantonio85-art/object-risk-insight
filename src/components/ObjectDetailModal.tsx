@@ -7,6 +7,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { RiskBadge } from "@/components/RiskBadge";
 import { VersionHistoryDrawer, type ProductVersion } from "@/components/VersionHistoryDrawer";
+import { ProductReEvaluationModal, type ReEvaluationStartPayload } from "@/components/ProductReEvaluationModal";
 import {
   objects, getManifestationsForObject, assessmentHistory, typeLabels, riskTypeLabels,
   lifecycleLabels, evaluationStatusLabels,
@@ -127,6 +128,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const [localEvalStatus, setLocalEvalStatus] = useState<string | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [versionDrawerOpen, setVersionDrawerOpen] = useState(false);
+  const [reEvalModalOpen, setReEvalModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
