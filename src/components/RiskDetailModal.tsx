@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
   X, ChevronRight, ChevronDown, AlertTriangle, Info, Shield, FileText,
   Sparkles, Bot, User, Newspaper, Scale, CircleAlert, CircleDot, Target,
-  ExternalLink, TrendingUp, Clock, Activity, ShieldAlert
+  ExternalLink, TrendingUp, Clock, ShieldAlert
 } from "lucide-react";
 import { RiskBadge } from "@/components/RiskBadge";
 import { risks, getManifestationsForRisk, typeLabels, riskTypeLabels } from "@/data/mock";
