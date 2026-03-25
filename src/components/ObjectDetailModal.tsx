@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { RiskBadge } from "@/components/RiskBadge";
+import { VersionHistoryDrawer, type ProductVersion } from "@/components/VersionHistoryDrawer";
 import {
   objects, getManifestationsForObject, assessmentHistory, typeLabels, riskTypeLabels,
   lifecycleLabels, evaluationStatusLabels,
@@ -38,6 +39,27 @@ const sourceIcons: Record<SourceItem["type"], React.ElementType> = {
 };
 const sourceLabels: Record<SourceItem["type"], string> = {
   law: "Закон", news: "Новость", document: "Документ", "ai-agent": "AI агент", manual: "Ручная оценка",
+};
+
+/* ─── Mock: Product versions ─── */
+const productVersions: Record<string, ProductVersion[]> = {
+  p1: [
+    { version: 3, date: "15.03.2026", evaluationStatus: "actual", riskLevel: "high", totalRisks: 5, highRisks: 3, summary: "Обнаружены 3 проявления рисков высокого уровня после изменений в законодательстве.", trigger: "law" },
+    { version: 2, date: "10.01.2026", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 3, highRisks: 1, summary: "Выявлена уязвимость в механизмах шифрования. Уровень риска повышен.", trigger: "ai" },
+    { version: 1, date: "05.11.2025", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 2, highRisks: 0, summary: "Первичная оценка. Базовые риски идентифицированы.", trigger: "documents" },
+  ],
+  p2: [
+    { version: 2, date: "20.01.2026", evaluationStatus: "needs-review", riskLevel: "high", totalRisks: 4, highRisks: 2, summary: "Мобильное приложение использует устаревший API. Высокий приоритет обновления.", trigger: "news" },
+    { version: 1, date: "15.09.2025", evaluationStatus: "actual", riskLevel: "high", totalRisks: 3, highRisks: 2, summary: "Критические уязвимости в протоколе передачи данных.", trigger: "documents" },
+  ],
+  p3: [
+    { version: 2, date: "10.03.2026", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 3, highRisks: 0, summary: "SLA не соответствует целевому показателю 99.95%. Рекомендуется улучшение.", trigger: "reassessment" },
+    { version: 1, date: "20.12.2025", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 2, highRisks: 0, summary: "Базовая оценка платёжного шлюза. Средний уровень риска.", trigger: "documents" },
+  ],
+  p5: [
+    { version: 2, date: "28.02.2026", evaluationStatus: "needs-review", riskLevel: "high", totalRisks: 3, highRisks: 1, summary: "Неконтролируемый доступ аналитиков к сырым данным. Необходимо внедрить ролевую модель.", trigger: "ai" },
+    { version: 1, date: "15.01.2026", evaluationStatus: "actual", riskLevel: "medium", totalRisks: 1, highRisks: 0, summary: "Первичная оценка рисков Data Lake.", trigger: "documents" },
+  ],
 };
 
 const objectSources: Record<string, SourceItem[]> = {
@@ -104,6 +126,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const [drawerItem, setDrawerItem] = useState<{ index: number; data: ReturnType<typeof getManifestationsForObject>[number] } | null>(null);
   const [localEvalStatus, setLocalEvalStatus] = useState<string | null>(null);
   const [accepted, setAccepted] = useState(false);
+  const [versionDrawerOpen, setVersionDrawerOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -142,6 +165,8 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const sources = objectSources[obj.id] || [];
   const aiSummary = aiSummaries[obj.id] || `Объект ${obj.riskLevel === "high" ? "содержит критические" : obj.riskLevel === "medium" ? "содержит умеренные" : "не содержит значимых"} рисков.`;
 
+  const versions = productVersions[obj.id] || [];
+  const currentVersion = versions.length > 0 ? versions[0].version : 1;
   const acceptedCount = Object.values(statuses).filter(s => s === "accepted").length;
   const previewManifestations = manifestationsData.slice(0, 3);
   const previewSources = sources.slice(0, 2);
@@ -488,10 +513,18 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                 Запустить оценку
               </button>
 
-              {history.length > 0 && (
-                <button className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-5 hover:shadow-sm transition-shadow">
-                  <span className="text-sm font-medium text-foreground">История версий</span>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              {versions.length > 0 && (
+                <button
+                  onClick={() => setVersionDrawerOpen(true)}
+                  className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-5 hover:shadow-sm hover:border-[hsl(var(--primary)/0.3)] transition-all"
+                >
+                  <div className="text-left">
+                    <span className="text-sm font-medium text-foreground">История версий</span>
+                    <p className="text-xs text-muted-foreground mt-0.5">v{currentVersion} · {versions.length} версий</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </button>
               )}
             </div>
@@ -661,6 +694,19 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             </>
           );
         })()}
+
+        {/* ── Version History Drawer ── */}
+        {versionDrawerOpen && versions.length > 0 && (
+          <VersionHistoryDrawer
+            versions={versions}
+            currentVersion={currentVersion}
+            onClose={() => setVersionDrawerOpen(false)}
+            onSelectVersion={(v) => {
+              setVersionDrawerOpen(false);
+              toast({ title: `Версия v${v.version}`, description: `Переключено на версию от ${v.date}` });
+            }}
+          />
+        )}
       </div>
     </div>
   );
