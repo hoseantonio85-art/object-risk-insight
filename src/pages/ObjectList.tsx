@@ -227,12 +227,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
             <InProgressProductCard
               key={i}
               product={p}
-              onClick={() => {
-                // In-progress products are clickable — open modal with placeholder
-                if (p.done) {
-                  // Could open a product detail, for now show eval modal
-                }
-              }}
+              onClick={() => setActiveInProgress(p)}
             />
           ))}
         </div>
