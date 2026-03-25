@@ -7,8 +7,11 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { useModalStack } from "@/contexts/ModalStackContext";
 import { ProductEvaluationModal, type ProductEvaluationStartPayload } from "@/components/ProductEvaluationModal";
 import { InProgressProductModal } from "@/components/InProgressProductModal";
-import { ProductCard, DiscoveredProductPill } from "@/components/ProductCard";
+import { ProductCard } from "@/components/ProductCard";
+import { DetectedProductCard } from "@/components/DetectedProductCard";
+import { DetectedProductModal } from "@/components/DetectedProductModal";
 import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, manifestations, objects, assessmentHistory, type EvaluationStatus } from "@/data/mock";
+import { detectedProducts as initialDetectedProducts, type DetectedProduct } from "@/data/detectedProducts";
 import { cn } from "@/lib/utils";
 
 const riskOptions: { value: RiskLevel | "all"; label: string }[] = [
