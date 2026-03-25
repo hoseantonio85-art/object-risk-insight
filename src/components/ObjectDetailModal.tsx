@@ -133,6 +133,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const [reEvalModalOpen, setReEvalModalOpen] = useState(false);
   const [localLifecycle, setLocalLifecycle] = useState<string | null>(null);
   const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [productDetailsOpen, setProductDetailsOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -354,7 +355,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
           </div>
 
           {/* Row 2: Title + Risk badge */}
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-1">
             <h1 className="text-lg font-semibold text-foreground">{obj.name}</h1>
             <div className="flex items-center gap-3">
               {!isNoEvaluation && !isAiAnalysis && <RiskBadge level={obj.riskLevel} />}
@@ -363,6 +364,20 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               </button>
             </div>
           </div>
+
+          {/* Row 2b: Description snippet + "Подробнее" */}
+          {obj.description && (
+            <div className="flex items-start gap-2 mb-3">
+              <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed flex-1">{obj.description}</p>
+              <button
+                onClick={() => setProductDetailsOpen(true)}
+                className="shrink-0 text-xs font-medium text-[hsl(var(--primary))] hover:underline transition-colors"
+              >
+                Подробнее
+              </button>
+            </div>
+          )}
+          {!obj.description && <div className="mb-3" />}
 
           {/* Row 3: Navigation (hide when no evaluation or during analysis) */}
           {!isNoEvaluation && !isAiAnalysis && (
@@ -717,20 +732,22 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                       {lifecycleLabels[lifecycle]}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Статус оценки</span>
-                    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", evalInfo.className)}>
-                      {evalInfo.label}
-                    </span>
-                  </div>
+                  {obj.createdDate && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Дата создания</span>
+                      <span className="text-foreground">{obj.createdDate}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Последняя оценка</span>
                     <span className="text-foreground">{obj.lastAssessment ?? "—"}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Риски</span>
-                    <span className="text-foreground">{manifestationsData.length}</span>
-                  </div>
+                  {!isNoEvaluation && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Риски</span>
+                      <span className="text-foreground">{manifestationsData.length}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -941,6 +958,94 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               toast({ title: `Версия v${v.version}`, description: `Переключено на версию от ${v.date}` });
             }}
           />
+        )}
+
+        {/* ── Product Details Drawer ── */}
+        {productDetailsOpen && (
+          <>
+            <div
+              className="absolute inset-0 z-30 bg-black/20 rounded-2xl transition-opacity duration-200"
+              onClick={() => setProductDetailsOpen(false)}
+            />
+            <div className="absolute right-0 top-0 bottom-0 z-40 w-[440px] bg-background border-l border-border rounded-r-2xl shadow-2xl flex flex-col animate-in slide-in-from-right duration-200">
+              <div className="px-5 py-4 border-b border-border shrink-0">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium text-muted-foreground">О продукте</span>
+                  <button onClick={() => setProductDetailsOpen(false)} className="h-7 w-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <h3 className="text-base font-semibold text-foreground">{obj.name}</h3>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5 space-y-5 no-scrollbar">
+                {/* Full description */}
+                <div className="space-y-2">
+                  <span className="text-xs font-medium text-muted-foreground">Полное описание</span>
+                  <p className="text-sm text-foreground leading-relaxed">{obj.description || "Описание не указано."}</p>
+                </div>
+
+                {/* Target audience */}
+                {obj.targetAudience && (
+                  <div className="space-y-2">
+                    <span className="text-xs font-medium text-muted-foreground">Целевая аудитория</span>
+                    <p className="text-sm text-foreground">{obj.targetAudience}</p>
+                  </div>
+                )}
+
+                {/* Product channel */}
+                {obj.productChannel && (
+                  <div className="space-y-2">
+                    <span className="text-xs font-medium text-muted-foreground">Тип / канал продукта</span>
+                    <p className="text-sm text-foreground">{obj.productChannel}</p>
+                  </div>
+                )}
+
+                {/* Lifecycle */}
+                <div className="space-y-2">
+                  <span className="text-xs font-medium text-muted-foreground">Жизненный цикл</span>
+                  <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium", lifecycleStyleMap[lifecycle])}>
+                    {lifecycleLabels[lifecycle]}
+                  </span>
+                </div>
+
+                {/* Created date */}
+                {obj.createdDate && (
+                  <div className="space-y-2">
+                    <span className="text-xs font-medium text-muted-foreground">Дата создания</span>
+                    <p className="text-sm text-foreground">{obj.createdDate}</p>
+                  </div>
+                )}
+
+                {/* Owner */}
+                {obj.owner && (
+                  <div className="space-y-2">
+                    <span className="text-xs font-medium text-muted-foreground">Владелец</span>
+                    <div className="flex items-center gap-2">
+                      <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
+                        <User className="h-3 w-3 text-muted-foreground" />
+                      </div>
+                      <p className="text-sm text-foreground">{obj.owner}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Source */}
+                {obj.source && (
+                  <div className="space-y-2">
+                    <span className="text-xs font-medium text-muted-foreground">Источник</span>
+                    <p className="text-sm text-foreground">{obj.source}</p>
+                  </div>
+                )}
+
+                {/* Last assessment */}
+                <div className="space-y-2">
+                  <span className="text-xs font-medium text-muted-foreground">Последняя оценка</span>
+                  <p className="text-sm text-foreground">{obj.lastAssessment ?? "Не проводилась"}</p>
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
         {/* ── Re-Evaluation Modal ── */}
