@@ -165,7 +165,8 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const sources = objectSources[obj.id] || [];
   const aiSummary = aiSummaries[obj.id] || `Объект ${obj.riskLevel === "high" ? "содержит критические" : obj.riskLevel === "medium" ? "содержит умеренные" : "не содержит значимых"} рисков.`;
 
-  const acceptedCount = Object.values(statuses).filter(s => s === "accepted").length;
+  const versions = productVersions[obj.id] || [];
+  const currentVersion = versions.length > 0 ? versions[0].version : 1;
   const previewManifestations = manifestationsData.slice(0, 3);
   const previewSources = sources.slice(0, 2);
 
@@ -511,10 +512,18 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                 Запустить оценку
               </button>
 
-              {history.length > 0 && (
-                <button className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-5 hover:shadow-sm transition-shadow">
-                  <span className="text-sm font-medium text-foreground">История версий</span>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+              {versions.length > 0 && (
+                <button
+                  onClick={() => setVersionDrawerOpen(true)}
+                  className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-5 hover:shadow-sm hover:border-[hsl(var(--primary)/0.3)] transition-all"
+                >
+                  <div className="text-left">
+                    <span className="text-sm font-medium text-foreground">История версий</span>
+                    <p className="text-xs text-muted-foreground mt-0.5">v{currentVersion} · {versions.length} версий</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  </div>
                 </button>
               )}
             </div>
