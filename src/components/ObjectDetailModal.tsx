@@ -180,6 +180,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const evalInfo = evalStyleMap[evaluationStatus] || evalStyleMap.actual;
 
   const isNoEvaluation = evaluationStatus === "none";
+  const isAiAnalysis = evaluationStatus === "ai-analysis";
   const isNeedsReview = evaluationStatus === "needs-review";
   const isConfirmed = evaluationStatus === "actual" || accepted;
 
