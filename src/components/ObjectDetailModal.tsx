@@ -2,10 +2,11 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
   X, ChevronDown, Sparkles, Clock, Target,
   Scale, Newspaper, FileText, Bot, User, Info,
-  Check, XCircle, ArrowRight, ChevronRight, ShieldAlert, Trash2, RotateCcw, CheckCircle2
+  Check, XCircle, ArrowRight, ChevronRight, ShieldAlert, Trash2, RotateCcw, CheckCircle2, Loader2
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { RiskBadge } from "@/components/RiskBadge";
+import { Progress } from "@/components/ui/progress";
 import { VersionHistoryDrawer, type ProductVersion } from "@/components/VersionHistoryDrawer";
 import { ProductReEvaluationModal, type ReEvaluationStartPayload } from "@/components/ProductReEvaluationModal";
 import {
@@ -131,6 +132,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const [versionDrawerOpen, setVersionDrawerOpen] = useState(false);
   const [reEvalModalOpen, setReEvalModalOpen] = useState(false);
   const [localLifecycle, setLocalLifecycle] = useState<string | null>(null);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -180,6 +182,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const evalInfo = evalStyleMap[evaluationStatus] || evalStyleMap.actual;
 
   const isNoEvaluation = evaluationStatus === "none";
+  const isAiAnalysis = evaluationStatus === "ai-analysis";
   const isNeedsReview = evaluationStatus === "needs-review";
   const isConfirmed = evaluationStatus === "actual" || accepted;
 
@@ -254,6 +257,18 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
     }
     setLocalEvalStatus("ai-analysis");
     setAccepted(false);
+    setAnalysisProgress(0);
+
+    // Animate progress
+    const progressInterval = setInterval(() => {
+      setAnalysisProgress(prev => {
+        if (prev >= 95) {
+          clearInterval(progressInterval);
+          return 95;
+        }
+        return prev + Math.random() * 15 + 5;
+      });
+    }, 600);
 
     toast({
       title: "Анализ запущен",
@@ -262,6 +277,9 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
     // Simulate completion after delay
     setTimeout(() => {
+      clearInterval(progressInterval);
+      setAnalysisProgress(100);
+
       const completionSummary = wasNoEvaluation
         ? `Анализ продукта «${obj.name}» выявил ${totalRisks} проявлений рисков, из них ${highRisks} высокого уровня. Обнаружены поведенческие риски, связанные с прозрачностью условий и согласием клиентов.`
         : (obj.riskLevel === "medium"
@@ -336,15 +354,15 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-lg font-semibold text-foreground">{obj.name}</h1>
             <div className="flex items-center gap-3">
-              {!isNoEvaluation && <RiskBadge level={obj.riskLevel} />}
+              {!isNoEvaluation && !isAiAnalysis && <RiskBadge level={obj.riskLevel} />}
               <button onClick={onClose} className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <X className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-          {/* Row 3: Navigation (hide when no evaluation) */}
-          {!isNoEvaluation && (
+          {/* Row 3: Navigation (hide when no evaluation or during analysis) */}
+          {!isNoEvaluation && !isAiAnalysis && (
             <div className="flex items-center gap-1.5 -mb-1">
               {sections.map(s => (
                 <button key={s.id} onClick={() => scrollToSection(s.id)}
@@ -383,6 +401,51 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                   <FileText className="h-4 w-4" />
                   Загрузить документы
                 </button>
+              </div>
+            </div>
+          ) : isAiAnalysis ? (
+            /* ── AI Analysis Progress State ── */
+            <div className="flex items-center justify-center p-8 min-h-[400px]">
+              <div className="max-w-lg w-full text-center space-y-6">
+                <div className="mx-auto h-14 w-14 rounded-2xl bg-[hsl(270_60%_95%)] flex items-center justify-center">
+                  <Loader2 className="h-7 w-7 text-[hsl(270_60%_50%)] animate-spin" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-base font-semibold text-foreground">AI анализирует документы</h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Система проверяет загруженные документы на соответствие требованиям и выявляет потенциальные риски.
+                  </p>
+                </div>
+                <div className="space-y-2 max-w-sm mx-auto">
+                  <Progress value={Math.min(analysisProgress, 100)} className="h-2" />
+                  <p className="text-xs text-muted-foreground">{Math.min(Math.round(analysisProgress), 100)}% завершено</p>
+                </div>
+                <div className="space-y-3 text-left max-w-sm mx-auto">
+                  <div className="flex items-center gap-3">
+                    <div className={cn("h-5 w-5 rounded-full flex items-center justify-center shrink-0", analysisProgress > 20 ? "bg-[hsl(var(--status-active-bg))]" : "bg-muted")}>
+                      {analysisProgress > 20 ? <Check className="h-3 w-3 text-[hsl(var(--status-active))]" /> : <Loader2 className="h-3 w-3 text-muted-foreground animate-spin" />}
+                    </div>
+                    <span className="text-xs text-foreground">Извлечение данных из документов</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={cn("h-5 w-5 rounded-full flex items-center justify-center shrink-0", analysisProgress > 50 ? "bg-[hsl(var(--status-active-bg))]" : analysisProgress > 20 ? "bg-muted" : "bg-muted/50")}>
+                      {analysisProgress > 50 ? <Check className="h-3 w-3 text-[hsl(var(--status-active))]" /> : analysisProgress > 20 ? <Loader2 className="h-3 w-3 text-muted-foreground animate-spin" /> : <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />}
+                    </div>
+                    <span className={cn("text-xs", analysisProgress > 20 ? "text-foreground" : "text-muted-foreground")}>Анализ операционных рисков</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={cn("h-5 w-5 rounded-full flex items-center justify-center shrink-0", analysisProgress > 80 ? "bg-[hsl(var(--status-active-bg))]" : analysisProgress > 50 ? "bg-muted" : "bg-muted/50")}>
+                      {analysisProgress > 80 ? <Check className="h-3 w-3 text-[hsl(var(--status-active))]" /> : analysisProgress > 50 ? <Loader2 className="h-3 w-3 text-muted-foreground animate-spin" /> : <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />}
+                    </div>
+                    <span className={cn("text-xs", analysisProgress > 50 ? "text-foreground" : "text-muted-foreground")}>Проверка поведенческих рисков</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={cn("h-5 w-5 rounded-full flex items-center justify-center shrink-0", analysisProgress >= 100 ? "bg-[hsl(var(--status-active-bg))]" : analysisProgress > 80 ? "bg-muted" : "bg-muted/50")}>
+                      {analysisProgress >= 100 ? <Check className="h-3 w-3 text-[hsl(var(--status-active))]" /> : analysisProgress > 80 ? <Loader2 className="h-3 w-3 text-muted-foreground animate-spin" /> : <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />}
+                    </div>
+                    <span className={cn("text-xs", analysisProgress > 80 ? "text-foreground" : "text-muted-foreground")}>Формирование отчёта</span>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
@@ -692,7 +755,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
         </div>
 
         {/* Bottom actions */}
-        {!isNoEvaluation && (
+        {!isNoEvaluation && !isAiAnalysis && (
         <div className="border-t border-border px-8 py-4 flex items-center justify-end gap-3">
           {isNeedsReview && !accepted && (
             <>
