@@ -344,17 +344,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   const titleRight = !isNoEvaluation && !isAiAnalysis ? <RiskBadge level={obj.riskLevel} /> : undefined;
 
-  const subtitle = obj.description ? (
-    <div className="flex items-start gap-2">
-      <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed flex-1">{obj.description}</p>
-      <button
-        onClick={() => setProductDetailsOpen(true)}
-        className="shrink-0 text-xs font-medium text-[hsl(var(--primary))] hover:underline transition-colors"
-      >
-        Подробнее
-      </button>
-    </div>
-  ) : undefined;
+  // Description moved to body content area
 
   const navigation = !isNoEvaluation && !isAiAnalysis ? (
     <ModalNavChips sections={sections} activeSection={activeSection} onNavigate={scrollToSection} />
@@ -545,6 +535,19 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
       >
         {/* ── OVERVIEW ── */}
         <section ref={setSectionRef("overview")} className="space-y-6">
+          {/* Description block */}
+          {obj.description && (
+            <div className="rounded-xl border border-border bg-card p-5">
+              <p className="text-sm text-foreground leading-relaxed line-clamp-3">{obj.description}</p>
+              <button
+                onClick={() => setProductDetailsOpen(true)}
+                className="mt-2 text-xs font-medium text-[hsl(var(--primary))] hover:underline transition-colors"
+              >
+                Подробнее
+              </button>
+            </div>
+          )}
+
           {accepted && (
             <div className="rounded-xl border border-[hsl(var(--status-active))/0.3] bg-[hsl(var(--status-active-bg))] p-4">
               <div className="flex items-start gap-3">
@@ -901,7 +904,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
         />
       )}
 
-      {/* Product Details Drawer */}
+      {/* Product Details Drawer — full description only */}
       {productDetailsOpen && (
         <>
           <div
@@ -911,7 +914,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
           <div className="absolute right-0 top-0 bottom-0 z-40 w-[440px] bg-background border-l border-border rounded-r-2xl shadow-2xl flex flex-col animate-in slide-in-from-right duration-200">
             <div className="px-5 py-4 border-b border-border shrink-0">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium text-muted-foreground">О продукте</span>
+                <span className="text-xs font-medium text-muted-foreground">Полное описание</span>
                 <button onClick={() => setProductDetailsOpen(false)} className="h-7 w-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                   <X className="h-3.5 w-3.5" />
                 </button>
@@ -919,56 +922,8 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               <h3 className="text-base font-semibold text-foreground">{obj.name}</h3>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 space-y-5 no-scrollbar">
-              <div className="space-y-2">
-                <span className="text-xs font-medium text-muted-foreground">Полное описание</span>
-                <p className="text-sm text-foreground leading-relaxed">{obj.description || "Описание не указано."}</p>
-              </div>
-              {obj.targetAudience && (
-                <div className="space-y-2">
-                  <span className="text-xs font-medium text-muted-foreground">Целевая аудитория</span>
-                  <p className="text-sm text-foreground">{obj.targetAudience}</p>
-                </div>
-              )}
-              {obj.productChannel && (
-                <div className="space-y-2">
-                  <span className="text-xs font-medium text-muted-foreground">Тип / канал продукта</span>
-                  <p className="text-sm text-foreground">{obj.productChannel}</p>
-                </div>
-              )}
-              <div className="space-y-2">
-                <span className="text-xs font-medium text-muted-foreground">Жизненный цикл</span>
-                <span className={cn("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium", lifecycleStyleMap[lifecycle])}>
-                  {lifecycleLabels[lifecycle]}
-                </span>
-              </div>
-              {obj.createdDate && (
-                <div className="space-y-2">
-                  <span className="text-xs font-medium text-muted-foreground">Дата создания</span>
-                  <p className="text-sm text-foreground">{obj.createdDate}</p>
-                </div>
-              )}
-              {obj.owner && (
-                <div className="space-y-2">
-                  <span className="text-xs font-medium text-muted-foreground">Владелец</span>
-                  <div className="flex items-center gap-2">
-                    <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center">
-                      <User className="h-3 w-3 text-muted-foreground" />
-                    </div>
-                    <p className="text-sm text-foreground">{obj.owner}</p>
-                  </div>
-                </div>
-              )}
-              {obj.source && (
-                <div className="space-y-2">
-                  <span className="text-xs font-medium text-muted-foreground">Источник</span>
-                  <p className="text-sm text-foreground">{obj.source}</p>
-                </div>
-              )}
-              <div className="space-y-2">
-                <span className="text-xs font-medium text-muted-foreground">Последняя оценка</span>
-                <p className="text-sm text-foreground">{obj.lastAssessment ?? "Не проводилась"}</p>
-              </div>
+            <div className="flex-1 overflow-y-auto p-5 no-scrollbar">
+              <p className="text-sm text-foreground leading-relaxed">{obj.description || "Описание не указано."}</p>
             </div>
           </div>
         </>
@@ -995,7 +950,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
       statusChips={statusChips}
       title={obj.name}
       titleRight={titleRight}
-      subtitle={subtitle}
+      
       navigation={navigation}
       headerExtra={headerExtra}
       footer={footer}
