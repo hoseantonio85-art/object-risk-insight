@@ -323,11 +323,20 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                       <div className="h-7 w-7 rounded-lg bg-[hsl(var(--status-active))/0.15] flex items-center justify-center shrink-0 mt-0.5">
                         <CheckCircle2 className="h-3.5 w-3.5 text-[hsl(var(--status-active))]" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <p className="text-sm font-medium text-[hsl(var(--status-active))] mb-0.5">Оценка риска подтверждена</p>
-                        <p className="text-xs text-[hsl(var(--status-active))/0.8]">
-                          Подтверждённые проявления учтены в продукте и могут влиять на корпоративные риски.
+                        <p className="text-xs text-[hsl(var(--status-active))/0.8] mb-0">
+                          Результаты зафиксированы и учитываются в продукте.
                         </p>
+                        {lifecycle === "planned" && (
+                          <button
+                            onClick={handleActivateProduct}
+                            className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-[hsl(var(--status-active))] text-white px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+                          >
+                            <ArrowRight className="h-3.5 w-3.5" />
+                            Перевести в действующие
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
