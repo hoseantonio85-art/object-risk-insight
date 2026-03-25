@@ -1,5 +1,4 @@
 import { X, Loader2, Sparkles, FileText, Bot } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface InProgressProduct {
   name: string;
