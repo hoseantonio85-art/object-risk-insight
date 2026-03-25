@@ -377,7 +377,20 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               ))}
             </div>
           )}
-        </div>
+
+          {/* Activation banner for planned products */}
+          {lifecycle === "planned" && obj.type === "product" && (
+            <div className="flex items-center justify-between gap-3 mt-2 rounded-xl border border-[hsl(var(--lifecycle-planned)/0.3)] bg-[hsl(var(--lifecycle-planned-bg))] px-4 py-3">
+              <p className="text-xs text-foreground">Продукт в статусе «Планируемый». Активация не требует оценки рисков.</p>
+              <button
+                onClick={handleActivateProduct}
+                className="inline-flex items-center gap-1.5 shrink-0 rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2 text-sm font-medium hover:opacity-90 transition-all"
+              >
+                <ArrowRight className="h-3.5 w-3.5" />
+                Перевести в действующие
+              </button>
+            </div>
+          )}
 
         {/* ── Scrollable Content ── */}
         <div ref={scrollRef} className="overflow-y-auto flex-1 no-scrollbar">
