@@ -255,13 +255,6 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
         />
       )}
 
-      {activeInProgress && (
-        <InProgressProductModal
-          product={activeInProgress}
-          onClose={() => setActiveInProgress(null)}
-          zIndex={60}
-        />
-      )}
-    </div>
+      </div>
   );
 }
