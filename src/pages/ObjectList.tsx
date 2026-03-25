@@ -387,7 +387,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
                 status: "none",
                 lastAssessment: null,
                 lifecycle: dp.lifecycle,
-                evaluationStatus: "ai-analysis",
+                evaluationStatus: "none",
               });
               setDetected((prev) => prev.filter((d) => d.id !== detectedId));
               setActiveDetected(null);
