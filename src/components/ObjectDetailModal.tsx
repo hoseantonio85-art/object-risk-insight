@@ -490,9 +490,16 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                 </div>
                 <div>
                   <h2 className="text-sm font-semibold text-foreground mb-1">Оценка не проводилась</h2>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
+                  <p className="text-xs text-muted-foreground leading-relaxed mb-3">
                     Загрузите документы, чтобы провести анализ рисков. Отсутствие оценки не означает отсутствие рисков.
                   </p>
+                  <button
+                    onClick={() => setReEvalModalOpen(true)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--brand-green))] text-[hsl(var(--brand-green-foreground))] px-3.5 py-2 text-sm font-medium hover:opacity-90 transition-all"
+                  >
+                    <FileText className="h-3.5 w-3.5" />
+                    Оценить продукт
+                  </button>
                 </div>
               </div>
             </div>

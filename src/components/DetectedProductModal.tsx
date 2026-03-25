@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Sparkles, Link2, Plus, ChevronRight } from "lucide-react";
+import { X, Sparkles, Link2, Plus, ChevronRight, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { objects, lifecycleLabels, type ProductLifecycle } from "@/data/mock";
@@ -36,6 +36,7 @@ export function DetectedProductModal({
   zIndex = 60,
 }: DetectedProductModalProps) {
   const [showLinkDrawer, setShowLinkDrawer] = useState(false);
+  const [showDescriptionDrawer, setShowDescriptionDrawer] = useState(false);
 
   const existingProducts = objects.filter((o) => o.type === "product");
   const activeProducts = existingProducts.filter((o) => o.lifecycle === "active");
@@ -259,32 +260,36 @@ export function DetectedProductModal({
           </div>
         </section>
 
-        {/* Empty sections */}
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Проявления рисков</h2>
-          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
-            <p className="text-sm text-muted-foreground">Проявления появятся после оценки</p>
-          </div>
-        </section>
+        {/* Description block */}
+        {product.description && (
+          <section className="space-y-3">
+            <h2 className="text-sm font-semibold text-foreground">Описание продукта</h2>
+            <div className="rounded-xl border border-border bg-card p-5">
+              <p className="text-sm text-foreground leading-relaxed line-clamp-3">{product.description}</p>
+              <button
+                onClick={() => setShowDescriptionDrawer(true)}
+                className="mt-2 text-xs font-medium text-[hsl(var(--primary))] hover:underline transition-colors"
+              >
+                Подробнее
+              </button>
+            </div>
+          </section>
+        )}
 
+        {/* No evaluation state */}
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Источники</h2>
-          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
-            <p className="text-sm text-muted-foreground">Источники не найдены</p>
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Контекст</h2>
-          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
-            <p className="text-sm text-muted-foreground">Контекст будет доступен после оценки</p>
-          </div>
-        </section>
-
-        <section className="space-y-3 pb-4">
-          <h2 className="text-sm font-semibold text-foreground">История оценок</h2>
-          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
-            <p className="text-sm text-muted-foreground">Оценки ещё не проводились</p>
+          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-6">
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 rounded-xl bg-[hsl(var(--brand-green)/0.1)] flex items-center justify-center shrink-0">
+                <FileText className="h-5 w-5 text-[hsl(var(--brand-green))]" />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-foreground mb-1">Оценка не проводилась</h2>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Загрузите документы, чтобы провести анализ рисков. Отсутствие оценки не означает отсутствие рисков.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
       </ModalBody>
