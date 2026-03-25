@@ -332,14 +332,13 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   /* ─── Build shell props ─── */
   const statusChips = (
-    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
-      {lifecycleLabels[lifecycle]}
-    </span>
+    <>
+      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
+        {lifecycleLabels[lifecycle]}
+      </span>
+      {obj.riskLevel !== "none" && <RiskBadge level={obj.riskLevel} />}
+    </>
   );
-
-  const titleRight = obj.riskLevel !== "none" ? <RiskBadge level={obj.riskLevel} /> : undefined;
-
-  // Description moved to body content area
 
   const navigation = (
     <ModalNavChips sections={sections} activeSection={activeSection} onNavigate={scrollToSection} />
@@ -935,8 +934,6 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
       zIndex={zIndex}
       statusChips={statusChips}
       title={obj.name}
-      titleRight={titleRight}
-      
       navigation={navigation}
       headerExtra={headerExtra}
       footer={footer}
