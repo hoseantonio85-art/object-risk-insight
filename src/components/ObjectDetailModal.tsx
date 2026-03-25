@@ -257,6 +257,18 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
     }
     setLocalEvalStatus("ai-analysis");
     setAccepted(false);
+    setAnalysisProgress(0);
+
+    // Animate progress
+    const progressInterval = setInterval(() => {
+      setAnalysisProgress(prev => {
+        if (prev >= 95) {
+          clearInterval(progressInterval);
+          return 95;
+        }
+        return prev + Math.random() * 15 + 5;
+      });
+    }, 600);
 
     toast({
       title: "Анализ запущен",
