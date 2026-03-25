@@ -1,14 +1,14 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, Plus, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { RiskBadge } from "@/components/RiskBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useModalStack } from "@/contexts/ModalStackContext";
-import { ProductEvaluationModal } from "@/components/ProductEvaluationModal";
+import { ProductEvaluationModal, type ProductEvaluationStartPayload } from "@/components/ProductEvaluationModal";
 import { InProgressProductModal } from "@/components/InProgressProductModal";
 import { ProductCard, DiscoveredProductPill } from "@/components/ProductCard";
-import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, manifestations } from "@/data/mock";
+import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, manifestations, objects, assessmentHistory } from "@/data/mock";
 import { cn } from "@/lib/utils";
 
 const riskOptions: { value: RiskLevel | "all"; label: string }[] = [
@@ -43,14 +43,46 @@ const quickFilters: { value: QuickFilter; label: string }[] = [
 ];
 
 interface InProgressProduct {
+  id: string;
   name: string;
   startedAt: number;
   progress: number;
   done: boolean;
+  lifecycle?: string;
+  launchDate?: string;
+  documents: Array<{ name: string; sizeKb: number }>;
+  generatedManifestations: Array<{ riskId: string; level: RiskLevel; comment: string }>;
 }
 
 // Mock discovered products
 const discoveredProducts = ["СберПей Лайт", "Инвест-Консалт"];
+
+const generateProductId = () => `np-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const createGeneratedManifestations = (productName: string): InProgressProduct["generatedManifestations"] => [
+  {
+    riskId: "br1",
+    level: "high",
+    comment: `В продукте «${productName}» обнаружено подключение услуги без явного согласия клиента`,
+  },
+  {
+    riskId: "r3",
+    level: "high",
+    comment: `Для продукта «${productName}» выявлены признаки несоответствия регуляторным требованиям`,
+  },
+  {
+    riskId: "br2",
+    level: "medium",
+    comment: `В материалах по «${productName}» недостаточно прозрачно раскрыты условия тарифа`,
+  },
+];
+
+const getAggregateRiskLevel = (items: InProgressProduct["generatedManifestations"]): RiskLevel => {
+  if (items.some((item) => item.level === "high")) return "high";
+  if (items.some((item) => item.level === "medium")) return "medium";
+  if (items.some((item) => item.level === "low")) return "low";
+  return "none";
+};
 
 export default function ObjectList({ objectType }: { objectType: ObjectType }) {
   const { openObject } = useModalStack();
@@ -64,6 +96,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
   const [showEvalModal, setShowEvalModal] = useState(false);
   const [inProgress, setInProgress] = useState<InProgressProduct[]>([]);
   const [activeAnalyzing, setActiveAnalyzing] = useState<InProgressProduct | null>(null);
+  const finalizedProductIds = useRef<Set<string>>(new Set());
 
   // Simulate progress
   useEffect(() => {
@@ -79,9 +112,66 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
     return () => clearInterval(interval);
   }, []);
 
-  const handleEvaluationStarted = (productName: string) => {
-    setInProgress(prev => [...prev, { name: productName, startedAt: Date.now(), progress: 5, done: false }]);
+  const handleEvaluationStarted = (payload: ProductEvaluationStartPayload) => {
+    const createdId = generateProductId();
+    const productName = payload.productName;
+
+    setInProgress((prev) => [
+      ...prev,
+      {
+        id: createdId,
+        name: productName,
+        startedAt: Date.now(),
+        progress: 5,
+        done: false,
+        lifecycle: payload.lifecycle,
+        launchDate: payload.launchDate,
+        documents: payload.files,
+        generatedManifestations: createGeneratedManifestations(productName),
+      },
+    ]);
   };
+
+  useEffect(() => {
+    const completed = inProgress.filter((item) => item.done && !finalizedProductIds.current.has(item.id));
+    if (completed.length === 0) return;
+
+    const today = new Date().toISOString().slice(0, 10);
+
+    completed.forEach((item) => {
+      finalizedProductIds.current.add(item.id);
+      if (!objects.some((obj) => obj.id === item.id)) {
+        const aggregateLevel = getAggregateRiskLevel(item.generatedManifestations);
+
+        objects.unshift({
+          id: item.id,
+          name: item.name,
+          type: "product",
+          riskLevel: aggregateLevel,
+          status: "progress",
+          lastAssessment: today,
+          description: `Оценка продукта «${item.name}» завершена и ожидает подтверждения`,
+        });
+
+        item.generatedManifestations.forEach((manifestation) => {
+          manifestations.unshift({
+            riskId: manifestation.riskId,
+            objectId: item.id,
+            level: manifestation.level,
+            comment: manifestation.comment,
+          });
+        });
+
+        assessmentHistory[item.id] = [
+          { date: today, type: "AI", level: aggregateLevel },
+        ];
+      }
+    });
+
+    const completedIds = new Set(completed.map((item) => item.id));
+    setInProgress((prev) => prev.filter((item) => !completedIds.has(item.id)));
+    setActiveAnalyzing((prev) => (prev && completedIds.has(prev.id) ? null : prev));
+  }, [inProgress]);
 
   const items = useMemo(() => {
     let list = getObjectsByType(objectType);
@@ -104,7 +194,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
     }
 
     return list;
-  }, [objectType, riskFilter, statusFilter, search, quickFilter]);
+  }, [objectType, riskFilter, statusFilter, search, quickFilter, inProgress]);
 
   const config = typeConfig[objectType];
   const isProductView = objectType === "product";
@@ -224,13 +314,13 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-up stagger-2">
         {inProgress.map((p, i) => (
           <ProductCard
-            key={`ip-${i}`}
+            key={p.id}
             inProgressName={p.name}
             inProgressProgress={p.progress}
             inProgressDone={p.done}
             onClick={() => {
               if (p.done) {
-                openObject("p5");
+                openObject(p.id);
               } else {
                 setActiveAnalyzing(p);
               }
