@@ -278,9 +278,6 @@ export function RiskDetailModal({ riskId, onClose, onOpenObject, zIndex = 50 }: 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-1.5">
                         <span className="text-xs font-medium text-muted-foreground">AI-сводка</span>
-                        <span className="inline-flex items-center rounded-md border border-border px-2 py-0.5 text-xs font-medium text-foreground">
-                          {isBehavior ? "Мониторинг" : "Снижение"}
-                        </span>
                       </div>
                       <p className="text-sm text-foreground leading-relaxed">{aiSummary}</p>
                       {changeEvent && (
@@ -301,7 +298,6 @@ export function RiskDetailModal({ riskId, onClose, onOpenObject, zIndex = 50 }: 
                   <button onClick={() => setRiskLevelOpen(!riskLevelOpen)} className="w-full flex items-center justify-between p-5 hover:bg-accent/30 transition-colors">
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-semibold text-foreground">Уровень риска</span>
-                      <RiskBadge level={risk.level} />
                       <span className="inline-flex items-center rounded-md border border-border px-2 py-0.5 text-xs font-medium text-foreground">
                         {isBehavior ? "Мониторинг" : "Снижение"}
                       </span>
@@ -382,18 +378,9 @@ export function RiskDetailModal({ riskId, onClose, onOpenObject, zIndex = 50 }: 
                     <Target className="h-3 w-3 text-muted-foreground" />
                     Проявления: {manifestationsData.length}
                   </div>
-                  {highCount > 0 && (
-                    <div className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--risk-high-bg))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--risk-high))]">
-                      Высокий: {highCount}
-                    </div>
-                  )}
                   <div className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
                     <Shield className="h-3 w-3 text-muted-foreground" />
                     Меры: {riskMeasures.length}
-                  </div>
-                  <div className="inline-flex items-center gap-1.5 rounded-full bg-[hsl(var(--status-active-bg))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--status-active))]">
-                    <Activity className="h-3 w-3" />
-                    Покрытие: {effectivenessPercent}%
                   </div>
                   <div className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-muted-foreground">
                     <Clock className="h-3 w-3" />
@@ -413,13 +400,6 @@ export function RiskDetailModal({ riskId, onClose, onOpenObject, zIndex = 50 }: 
                       {manifestationsData.length > 0 ? `в ${manifestationsData.length} объектах` : ""}
                     </span>
                   </div>
-                  {manifestationsData.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      {highCount > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--risk-high-bg))] text-[hsl(var(--risk-high))] px-2 py-0.5 text-xs font-medium">Высокий {highCount}</span>}
-                      {mediumCount > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))] px-2 py-0.5 text-xs font-medium">Средний {mediumCount}</span>}
-                      {lowCount > 0 && <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--risk-low-bg))] text-[hsl(var(--risk-low))] px-2 py-0.5 text-xs font-medium">Низкий {lowCount}</span>}
-                    </div>
-                  )}
                 </div>
 
                 {manifestationsData.length > 0 ? (
