@@ -26,6 +26,7 @@ const evalStatusOptions: { value: EvaluationStatus | "all"; label: string }[] = 
   { value: "actual", label: "Актуально" },
   { value: "needs-review", label: "Требует проверки" },
   { value: "ai-analysis", label: "AI анализ" },
+  { value: "none", label: "Нет оценки" },
 ];
 
 const typeConfig: Record<ObjectType, { title: string }> = {
@@ -364,6 +365,12 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
           product={activeDetected}
           onClose={() => setActiveDetected(null)}
           onLinked={(detectedId, existingId) => {
+            const objIdx = objects.findIndex(o => o.id === existingId);
+            if (objIdx !== -1) {
+              objects[objIdx].evaluationStatus = "none";
+              objects[objIdx].status = "none";
+              objects[objIdx].riskLevel = "none";
+            }
             setDetected((prev) => prev.filter((d) => d.id !== detectedId));
             setActiveDetected(null);
             openObject(existingId);

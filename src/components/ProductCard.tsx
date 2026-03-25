@@ -1,4 +1,4 @@
-import { Loader2, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Loader2, Sparkles, ArrowRight, CheckCircle2, FileText } from "lucide-react";
 import { RiskBadge } from "@/components/RiskBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -54,6 +54,10 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
       actual: {
         label: "Оценка подтверждена",
         icon: <CheckCircle2 className="h-3 w-3 text-[hsl(var(--status-active))] shrink-0" />,
+      },
+      none: {
+        label: "Нет оценки",
+        icon: <FileText className="h-3 w-3 text-[hsl(var(--status-none))] shrink-0" />,
       },
     };
     evalLabel = map[status].label;

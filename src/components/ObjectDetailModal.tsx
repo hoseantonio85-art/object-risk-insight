@@ -99,6 +99,7 @@ const evalStyleMap: Record<string, { label: string; className: string }> = {
   "ai-analysis": { label: "AI анализ", className: "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]" },
   "needs-review": { label: "Анализ завершён", className: "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]" },
   actual: { label: "Оценка подтверждена", className: "bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))]" },
+  none: { label: "Нет оценки", className: "bg-[hsl(var(--status-none-bg))] text-[hsl(var(--status-none))]" },
 };
 
 /* ─── Anchor nav sections ─── */
@@ -178,6 +179,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const evaluationStatus = localEvalStatus || obj.evaluationStatus || "actual";
   const evalInfo = evalStyleMap[evaluationStatus] || evalStyleMap.actual;
 
+  const isNoEvaluation = evaluationStatus === "none";
   const isNeedsReview = evaluationStatus === "needs-review";
   const isConfirmed = evaluationStatus === "actual" || accepted;
 
@@ -288,28 +290,56 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-lg font-semibold text-foreground">{obj.name}</h1>
             <div className="flex items-center gap-3">
-              <RiskBadge level={obj.riskLevel} />
+              {!isNoEvaluation && <RiskBadge level={obj.riskLevel} />}
               <button onClick={onClose} className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <X className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-          {/* Row 3: Navigation */}
-          <div className="flex items-center gap-1.5 -mb-1">
-            {sections.map(s => (
-              <button key={s.id} onClick={() => scrollToSection(s.id)}
-                className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-                  activeSection === s.id ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
-                )}>
-                {s.label}
-              </button>
-            ))}
-          </div>
+          {/* Row 3: Navigation (hide when no evaluation) */}
+          {!isNoEvaluation && (
+            <div className="flex items-center gap-1.5 -mb-1">
+              {sections.map(s => (
+                <button key={s.id} onClick={() => scrollToSection(s.id)}
+                  className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+                    activeSection === s.id ? "bg-foreground text-background" : "bg-muted text-muted-foreground hover:text-foreground hover:bg-accent"
+                  )}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── Scrollable Content ── */}
         <div ref={scrollRef} className="overflow-y-auto flex-1 no-scrollbar">
+          {isNoEvaluation ? (
+            /* ── Empty Evaluation State ── */
+            <div className="flex items-center justify-center p-8 min-h-[400px]">
+              <div className="max-w-md text-center space-y-4">
+                <div className="mx-auto h-14 w-14 rounded-2xl bg-[hsl(var(--brand-green)/0.1)] flex items-center justify-center">
+                  <FileText className="h-7 w-7 text-[hsl(var(--brand-green))]" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-base font-semibold text-foreground">Это новая версия продукта</h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Загрузите документы, чтобы провести оценку рисков.
+                  </p>
+                  <p className="text-xs text-muted-foreground/70">
+                    Продукт был обнаружен системой и привязан к существующему. Оценка рисков ещё не проводилась.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setReEvalModalOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--brand-green))] text-[hsl(var(--brand-green-foreground))] px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-all"
+                >
+                  <FileText className="h-4 w-4" />
+                  Загрузить документы
+                </button>
+              </div>
+            </div>
+          ) : (
           <div className="flex gap-6 p-8">
             {/* Main column */}
             <div className="flex-1 min-w-0 space-y-6">
@@ -612,9 +642,11 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               )}
             </div>
           </div>
+          )}
         </div>
 
         {/* Bottom actions */}
+        {!isNoEvaluation && (
         <div className="border-t border-border px-8 py-4 flex items-center justify-end gap-3">
           {isNeedsReview && !accepted && (
             <>
@@ -644,6 +676,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             </button>
           )}
         </div>
+        )}
 
         {/* ── Manifestation Drawer ── */}
         {drawerItem && (() => {
