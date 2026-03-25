@@ -48,8 +48,8 @@ export const lifecycleLabels: Record<ProductLifecycle, string> = {
 
 export const evaluationStatusLabels: Record<EvaluationStatus, string> = {
   "ai-analysis": "AI анализ",
-  "needs-review": "Требует проверки",
-  actual: "Актуально",
+  "needs-review": "Анализ завершён",
+  actual: "Оценка подтверждена",
 };
 
 export const objects: ObjectItem[] = [
