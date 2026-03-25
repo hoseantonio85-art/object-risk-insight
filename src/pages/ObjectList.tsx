@@ -217,9 +217,9 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
             className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
             {riskOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)}
+          <select value={evalFilter} onChange={(e) => setEvalFilter(e.target.value as any)}
             className="h-9 rounded-lg border border-border bg-card px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
-            {statusOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {evalStatusOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
 
