@@ -4,13 +4,21 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { objects, lifecycleLabels, type ProductLifecycle } from "@/data/mock";
 import type { DetectedProduct } from "@/data/detectedProducts";
-import { ProductModalShell, ModalBody } from "@/components/ProductModalShell";
+import { ProductModalShell, ModalBody, ModalNavChips } from "@/components/ProductModalShell";
 
 const lifecycleStyleMap: Record<ProductLifecycle, string> = {
   planned: "bg-[hsl(var(--lifecycle-planned-bg))] text-[hsl(var(--lifecycle-planned))]",
   active: "bg-[hsl(var(--lifecycle-active-bg))] text-[hsl(var(--lifecycle-active))]",
   closed: "bg-[hsl(var(--lifecycle-closed-bg))] text-[hsl(var(--lifecycle-closed))]",
 };
+
+const sections = [
+  { id: "overview", label: "Обзор" },
+  { id: "manifestations", label: "Проявления" },
+  { id: "sources", label: "Источники" },
+  { id: "context", label: "Контекст" },
+  { id: "history", label: "История" },
+] as const;
 
 interface DetectedProductModalProps {
   product: DetectedProduct;
@@ -58,6 +66,29 @@ export function DetectedProductModal({
       <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[product.lifecycle])}>
         {lifecycleLabels[product.lifecycle]}
       </span>
+    </>
+  );
+
+  const navigation = (
+    <ModalNavChips sections={sections} activeSection="overview" onNavigate={() => {}} />
+  );
+
+  const footer = (
+    <>
+      <button
+        onClick={() => setShowLinkDrawer(true)}
+        className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors"
+      >
+        <Link2 className="h-4 w-4" />
+        Привязать к продукту
+      </button>
+      <button
+        onClick={handleContinueAsNew}
+        className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--brand-green))] text-[hsl(var(--brand-green-foreground))] px-4 py-2 text-sm font-medium hover:opacity-90 transition-all"
+      >
+        <Plus className="h-4 w-4" />
+        Продолжить как новый
+      </button>
     </>
   );
 
@@ -145,6 +176,8 @@ export function DetectedProductModal({
       zIndex={zIndex}
       statusChips={statusChips}
       title={product.name}
+      navigation={navigation}
+      footer={footer}
       drawers={linkDrawer}
     >
       <ModalBody
@@ -153,8 +186,8 @@ export function DetectedProductModal({
             <h3 className="text-sm font-semibold text-foreground">Информация</h3>
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Название</span>
-                <span className="font-medium text-foreground truncate ml-2">{product.name}</span>
+                <span className="text-muted-foreground">Тип</span>
+                <span className="font-medium text-foreground">Продукт</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Жизненный цикл</span>
@@ -166,46 +199,63 @@ export function DetectedProductModal({
                 <span className="text-muted-foreground">Источник</span>
                 <span className="text-foreground">{product.sourceHint}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Статус</span>
-                <span className="font-medium text-[hsl(var(--brand-green))]">Ожидает решения</span>
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Статус оценки</span>
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium bg-[hsl(var(--brand-green)/0.15)] text-[hsl(var(--brand-green))]">
+                  Ожидает решения
+                </span>
               </div>
             </div>
           </div>
         }
       >
         {/* Decision Banner */}
-        <div className="rounded-xl border border-[hsl(var(--brand-green)/0.3)] bg-[hsl(var(--brand-green-bg))] p-5">
-          <div className="flex items-start gap-4">
-            <div className="h-10 w-10 rounded-xl bg-[hsl(var(--brand-green)/0.15)] flex items-center justify-center shrink-0">
-              <Sparkles className="h-5 w-5 text-[hsl(var(--brand-green))]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-sm font-semibold text-foreground mb-1">
-                Этот продукт уже прорабатывался?
-              </h2>
-              <p className="text-xs text-muted-foreground mb-4">
-                Можно привязать его к существующему или продолжить как новый.
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowLinkDrawer(true)}
-                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors"
-                >
-                  <Link2 className="h-4 w-4" />
-                  Привязать к продукту
-                </button>
-                <button
-                  onClick={handleContinueAsNew}
-                  className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--brand-green))] text-[hsl(var(--brand-green-foreground))] px-4 py-2 text-sm font-medium hover:opacity-90 transition-all"
-                >
-                  <Plus className="h-4 w-4" />
-                  Продолжить как новый
-                </button>
+        <section className="space-y-6">
+          <div className="rounded-xl border border-[hsl(var(--brand-green)/0.3)] bg-[hsl(var(--brand-green-bg))] p-5">
+            <div className="flex items-start gap-4">
+              <div className="h-10 w-10 rounded-xl bg-[hsl(var(--brand-green)/0.15)] flex items-center justify-center shrink-0">
+                <Sparkles className="h-5 w-5 text-[hsl(var(--brand-green))]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-sm font-semibold text-foreground mb-1">
+                  Этот продукт уже прорабатывался?
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  Можно привязать его к существующему или продолжить как новый.
+                </p>
               </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        {/* Empty sections */}
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-foreground">Проявления рисков</h2>
+          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
+            <p className="text-sm text-muted-foreground">Проявления появятся после оценки</p>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-foreground">Источники</h2>
+          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
+            <p className="text-sm text-muted-foreground">Источники не найдены</p>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-sm font-semibold text-foreground">Контекст</h2>
+          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
+            <p className="text-sm text-muted-foreground">Контекст будет доступен после оценки</p>
+          </div>
+        </section>
+
+        <section className="space-y-3 pb-4">
+          <h2 className="text-sm font-semibold text-foreground">История оценок</h2>
+          <div className="rounded-xl border border-dashed border-border bg-muted/30 p-5 text-center">
+            <p className="text-sm text-muted-foreground">Оценки ещё не проводились</p>
+          </div>
+        </section>
       </ModalBody>
     </ProductModalShell>
   );

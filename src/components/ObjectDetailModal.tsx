@@ -9,7 +9,7 @@ import { RiskBadge } from "@/components/RiskBadge";
 import { Progress } from "@/components/ui/progress";
 import { VersionHistoryDrawer, type ProductVersion } from "@/components/VersionHistoryDrawer";
 import { ProductReEvaluationModal, type ReEvaluationStartPayload } from "@/components/ProductReEvaluationModal";
-import { ProductModalShell, ModalBody, ModalCenteredContent, ModalNavChips } from "@/components/ProductModalShell";
+import { ProductModalShell, ModalBody, ModalNavChips } from "@/components/ProductModalShell";
 import {
   objects, getManifestationsForObject, assessmentHistory, typeLabels, riskTypeLabels,
   lifecycleLabels, evaluationStatusLabels, manifestations,
