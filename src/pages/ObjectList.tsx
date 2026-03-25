@@ -227,7 +227,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
             <InProgressProductCard
               key={i}
               product={p}
-              onClick={() => setActiveInProgress(p)}
+              onClick={() => openObject("p5")}
             />
           ))}
         </div>
