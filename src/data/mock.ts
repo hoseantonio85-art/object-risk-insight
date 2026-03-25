@@ -16,6 +16,12 @@ export interface ObjectItem {
   /** Product-specific fields */
   lifecycle?: ProductLifecycle;
   evaluationStatus?: EvaluationStatus;
+  /** Product metadata */
+  targetAudience?: string;
+  productChannel?: string;
+  createdDate?: string;
+  owner?: string;
+  source?: string;
 }
 
 export interface RiskItem {
@@ -54,13 +60,13 @@ export const evaluationStatusLabels: Record<EvaluationStatus, string> = {
 };
 
 export const objects: ObjectItem[] = [
-  { id: "p1", name: "CRM Enterprise", type: "product", riskLevel: "high", status: "actual", lastAssessment: "2026-03-15", description: "Основная CRM-система для корпоративных клиентов", lifecycle: "active", evaluationStatus: "actual" },
-  { id: "p2", name: "Мобильный банк 3.0", type: "product", riskLevel: "high", status: "stale", lastAssessment: "2026-01-20", description: "Мобильное приложение для розничных клиентов", lifecycle: "active", evaluationStatus: "needs-review" },
-  { id: "p3", name: "Платёжный шлюз", type: "product", riskLevel: "medium", status: "actual", lastAssessment: "2026-03-10", description: "Шлюз обработки платежей", lifecycle: "active", evaluationStatus: "actual" },
-  { id: "p4", name: "Внутренний портал", type: "product", riskLevel: "low", status: "actual", lastAssessment: "2026-03-12", description: "Портал для сотрудников компании", lifecycle: "active", evaluationStatus: "actual" },
-  { id: "p5", name: "Data Lake", type: "product", riskLevel: "high", status: "progress", lastAssessment: "2026-02-28", description: "Централизованное хранилище данных", lifecycle: "active", evaluationStatus: "needs-review" },
-  { id: "p6", name: "Цифровой вклад", type: "product", riskLevel: "none", status: "none", lastAssessment: null, description: "Новый депозитный продукт с гибкими условиями", lifecycle: "planned", evaluationStatus: "none" },
-  { id: "p7", name: "Семейная подписка", type: "product", riskLevel: "none", status: "none", lastAssessment: null, description: "Пакетное предложение для семейных клиентов", lifecycle: "planned", evaluationStatus: "none" },
+  { id: "p1", name: "CRM Enterprise", type: "product", riskLevel: "high", status: "actual", lastAssessment: "2026-03-15", description: "Основная CRM-система для управления взаимоотношениями с корпоративными клиентами. Поддерживает полный цикл продаж, сервисное обслуживание и аналитику клиентской базы.", lifecycle: "active", evaluationStatus: "actual", targetAudience: "Корпоративные клиенты B2B", productChannel: "Web-платформа", createdDate: "2024-06-15", owner: "Иванов А.С." },
+  { id: "p2", name: "Мобильный банк 3.0", type: "product", riskLevel: "high", status: "stale", lastAssessment: "2026-01-20", description: "Мобильное приложение для розничных клиентов с функциями переводов, платежей, управления счетами и инвестициями. Третья версия с обновлённым интерфейсом и биометрической аутентификацией.", lifecycle: "active", evaluationStatus: "needs-review", targetAudience: "Розничные клиенты (физические лица)", productChannel: "iOS / Android", createdDate: "2025-02-01", owner: "Петрова М.В." },
+  { id: "p3", name: "Платёжный шлюз", type: "product", riskLevel: "medium", status: "actual", lastAssessment: "2026-03-10", description: "Шлюз обработки онлайн-платежей для интернет-магазинов и сервисов. Поддерживает карточные платежи, СБП и электронные кошельки.", lifecycle: "active", evaluationStatus: "actual", targetAudience: "Юридические лица (мерчанты)", productChannel: "API-интеграция", createdDate: "2023-11-20", owner: "Козлов Д.И." },
+  { id: "p4", name: "Внутренний портал", type: "product", riskLevel: "low", status: "actual", lastAssessment: "2026-03-12", description: "Корпоративный портал для сотрудников с доступом к HR-сервисам, базе знаний, заявкам на оборудование и внутренним коммуникациям.", lifecycle: "active", evaluationStatus: "actual", targetAudience: "Сотрудники компании", productChannel: "Web-портал (интранет)", createdDate: "2022-09-01", owner: "Смирнова Е.А." },
+  { id: "p5", name: "Data Lake", type: "product", riskLevel: "high", status: "progress", lastAssessment: "2026-02-28", description: "Централизованное хранилище данных для аналитических и ML-задач. Агрегирует данные из всех продуктовых систем, CRM и внешних источников.", lifecycle: "active", evaluationStatus: "needs-review", targetAudience: "Аналитики и Data Science", productChannel: "Внутренняя платформа", createdDate: "2025-05-10", owner: "Волков К.Р." },
+  { id: "p6", name: "Цифровой вклад", type: "product", riskLevel: "none", status: "none", lastAssessment: null, description: "Новый депозитный продукт с гибкими условиями пополнения и снятия. Полностью цифровое оформление без визита в отделение.", lifecycle: "planned", evaluationStatus: "none", targetAudience: "Розничные клиенты (вкладчики)", productChannel: "Мобильное приложение", createdDate: "2026-03-01", owner: "Новикова О.П." },
+  { id: "p7", name: "Семейная подписка", type: "product", riskLevel: "none", status: "none", lastAssessment: null, description: "Пакетное предложение для семей: общий счёт, детские карты, кэшбэк на семейные покупки и страховка.", lifecycle: "planned", evaluationStatus: "none", targetAudience: "Семейные клиенты", productChannel: "Мобильное приложение / Web", createdDate: "2026-02-15", owner: "Кузнецов В.А." },
   { id: "c1", name: "ООО «ТехноСофт»", type: "counterparty", riskLevel: "high", status: "actual", lastAssessment: "2026-03-14", description: "Поставщик IT-инфраструктуры" },
   { id: "c2", name: "CloudServe Inc.", type: "counterparty", riskLevel: "medium", status: "stale", lastAssessment: "2025-12-01", description: "Облачный провайдер" },
   { id: "c3", name: "ИП Сидорова А.В.", type: "counterparty", riskLevel: "high", status: "actual", lastAssessment: "2026-03-18", description: "Консультант по безопасности" },
