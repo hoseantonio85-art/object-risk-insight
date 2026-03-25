@@ -1,7 +1,8 @@
-import { Loader2, FileText, Bot, Check } from "lucide-react";
+import { Loader2, FileText, Check } from "lucide-react";
 import { ProductModalShell, ModalBody, ModalNavChips } from "@/components/ProductModalShell";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { lifecycleLabels, type ProductLifecycle } from "@/data/mock";
 
 interface InProgressProduct {
   id: string;
@@ -10,7 +11,16 @@ interface InProgressProduct {
   progress: number;
   done: boolean;
   documents: Array<{ name: string; sizeKb: number }>;
+  lifecycle?: ProductLifecycle;
+  description?: string;
+  createdDate?: string;
 }
+
+const lifecycleStyleMap: Record<string, string> = {
+  planned: "bg-[hsl(var(--lifecycle-planned-bg))] text-[hsl(var(--lifecycle-planned))]",
+  active: "bg-[hsl(var(--lifecycle-active-bg))] text-[hsl(var(--lifecycle-active))]",
+  closed: "bg-[hsl(var(--lifecycle-closed-bg))] text-[hsl(var(--lifecycle-closed))]",
+};
 
 const sections = [
   { id: "overview", label: "Обзор" },
@@ -30,10 +40,12 @@ export function InProgressProductModal({
   zIndex?: number;
 }) {
   const progressPct = Math.round(product.progress);
+  const lifecycle = product.lifecycle || "active";
 
+  /* ─── Row 1: lifecycle chip (no risk badge during analysis) ─── */
   const statusChips = (
-    <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]">
-      AI анализ
+    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
+      {lifecycleLabels[lifecycle]}
     </span>
   );
 
@@ -45,6 +57,47 @@ export function InProgressProductModal({
     <span className="text-xs text-muted-foreground">Анализ в процессе — действия будут доступны после завершения</span>
   );
 
+  /* ─── Right meta panel (mandatory, all fields) ─── */
+  const metaSidebar = (
+    <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+      <h3 className="text-sm font-semibold text-foreground">Информация</h3>
+      <div className="space-y-2 text-xs">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Тип</span>
+          <span className="font-medium text-foreground">Продукт</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Жизненный цикл</span>
+          <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
+            {lifecycleLabels[lifecycle]}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Дата создания</span>
+          <span className="text-foreground">{product.createdDate || "—"}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Последняя оценка</span>
+          <span className="text-foreground">—</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-muted-foreground">Статус оценки</span>
+          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]">
+            AI анализ
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Риски</span>
+          <span className="text-foreground">—</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Документы</span>
+          <span className="text-foreground">{product.documents.length}</span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <ProductModalShell
       onClose={onClose}
@@ -54,31 +107,14 @@ export function InProgressProductModal({
       navigation={navigation}
       footer={footer}
     >
-      <ModalBody
-        sidebar={
-          <>
-            <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">Информация</h3>
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Тип</span>
-                  <span className="font-medium text-foreground">Продукт</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Статус</span>
-                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]">
-                    AI анализ
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Документы</span>
-                  <span className="text-foreground">{product.documents.length}</span>
-                </div>
-              </div>
-            </div>
-          </>
-        }
-      >
+      <ModalBody sidebar={metaSidebar}>
+        {/* ── Description block ── */}
+        {product.description && (
+          <div className="rounded-xl border border-border bg-card p-5">
+            <p className="text-sm text-foreground leading-relaxed line-clamp-3">{product.description}</p>
+          </div>
+        )}
+
         {/* AI Analysis progress */}
         <section className="space-y-6">
           <div className="rounded-xl border border-border bg-card p-5 space-y-5">
