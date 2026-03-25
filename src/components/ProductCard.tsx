@@ -2,7 +2,7 @@ import { Loader2, Sparkles, AlertTriangle, CheckCircle2, ArrowRight } from "luci
 import { RiskBadge } from "@/components/RiskBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { ObjectItem, manifestations } from "@/data/mock";
+import { ObjectItem, manifestations, lifecycleLabels, evaluationStatusLabels, type EvaluationStatus, type ProductLifecycle } from "@/data/mock";
 
 interface ProductCardProps {
   item?: ObjectItem;
@@ -11,6 +11,13 @@ interface ProductCardProps {
   inProgressProgress?: number;
   inProgressDone?: boolean;
   onClick: () => void;
+}
+
+/** Compute attention flag independently from status */
+function needsAttentionFlag(item: ObjectItem): boolean {
+  const itemManifestations = manifestations.filter(m => m.objectId === item.id);
+  const highRisks = itemManifestations.filter(m => m.level === "high").length;
+  return highRisks > 0 || item.evaluationStatus === "needs-review";
 }
 
 export function ProductCard({ item, inProgressName, inProgressProgress = 0, inProgressDone = false, onClick }: ProductCardProps) {
@@ -24,33 +31,47 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
   const highRisks = item ? itemManifestations.filter(m => m.level === "high").length : 0;
   const mediumRisks = item ? itemManifestations.filter(m => m.level === "medium").length : 0;
 
-  // Determine status
-  let statusLabel: string;
-  let statusClassName: string;
-  let needsAttention = false;
+  // Lifecycle label
+  const lifecycle: ProductLifecycle = item?.lifecycle || "active";
+  const lifecycleLabel = lifecycleLabels[lifecycle];
+
+  // Evaluation status
+  let evalStatus: EvaluationStatus;
+  let evalStatusLabel: string;
+  let evalStatusClassName: string;
 
   if (isAnalyzing) {
-    statusLabel = "AI анализ";
-    statusClassName = "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]";
+    evalStatus = "ai-analysis";
+    evalStatusLabel = "AI анализ";
+    evalStatusClassName = "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]";
   } else if (isReady) {
-    statusLabel = "В работе";
-    statusClassName = "bg-[hsl(var(--brand-green-bg))] text-[hsl(var(--brand-green))]";
-    needsAttention = true;
+    evalStatus = "needs-review";
+    evalStatusLabel = "Требует проверки";
+    evalStatusClassName = "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]";
   } else if (item) {
-    const statusConfig: Record<string, { label: string; className: string }> = {
-      actual: { label: "Актуально", className: "bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))]" },
-      stale: { label: "Требует внимания", className: "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]" },
-      progress: { label: "В работе", className: "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]" },
-      none: { label: "Требует внимания", className: "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]" },
+    evalStatus = item.evaluationStatus || "actual";
+    evalStatusLabel = evaluationStatusLabels[evalStatus];
+    const evalStyleMap: Record<EvaluationStatus, string> = {
+      "ai-analysis": "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]",
+      "needs-review": "bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))]",
+      actual: "bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))]",
     };
-    const s = statusConfig[item.status] || statusConfig.none;
-    statusLabel = s.label;
-    statusClassName = s.className;
-    needsAttention = item.status === "stale" || item.status === "none" || highRisks > 0;
+    evalStatusClassName = evalStyleMap[evalStatus];
   } else {
-    statusLabel = "";
-    statusClassName = "";
+    evalStatus = "ai-analysis";
+    evalStatusLabel = "";
+    evalStatusClassName = "";
   }
+
+  // Attention flag (separate from status)
+  const hasAttention = item ? needsAttentionFlag(item) : isReady;
+
+  // Lifecycle style
+  const lifecycleStyleMap: Record<ProductLifecycle, string> = {
+    planned: "bg-muted text-muted-foreground",
+    active: "bg-[hsl(var(--brand-green-bg))] text-[hsl(var(--brand-green))]",
+    closed: "bg-muted text-muted-foreground",
+  };
 
   // Activity hint
   let activityHint: string;
@@ -59,12 +80,12 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
   } else if (isReady) {
     activityHint = "Анализ завершён — проверьте результаты";
   } else if (item) {
-    activityHint = item.status === "progress"
+    activityHint = evalStatus === "ai-analysis"
       ? "Анализируется"
       : highRisks > 0
         ? `Обнаружены высокие риски (${highRisks})`
-        : item.status === "stale"
-          ? "Оценка устарела"
+        : evalStatus === "needs-review"
+          ? "Ожидает проверки"
           : "Оценка завершена";
   } else {
     activityHint = "";
@@ -81,22 +102,33 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         isAnalyzing
           ? "border-[hsl(var(--status-progress)/0.3)] opacity-90"
-          : needsAttention && !isReady
+          : hasAttention && !isReady
             ? "border-[hsl(var(--risk-medium)/0.3)]"
             : isReady
-              ? "border-[hsl(var(--brand-green)/0.3)]"
+              ? "border-[hsl(var(--risk-medium)/0.3)]"
               : "border-border"
       )}
     >
-      {/* Header: name + status */}
+      {/* Header: lifecycle + name + eval status */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className={cn("inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-medium", lifecycleStyleMap[lifecycle])}>
+              {lifecycleLabel}
+            </span>
+            {hasAttention && !isAnalyzing && (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-medium text-[hsl(var(--risk-medium))]">
+                <AlertTriangle className="h-2.5 w-2.5" />
+                Внимание
+              </span>
+            )}
+          </div>
           <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-[hsl(var(--brand-green))] transition-colors">
             {name}
           </h3>
         </div>
-        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ml-2", statusClassName)}>
-          {statusLabel}
+        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0 ml-2", evalStatusClassName)}>
+          {evalStatusLabel}
         </span>
       </div>
 
@@ -129,7 +161,7 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
           )}
           {item && <RiskBadge level={item.riskLevel} className="ml-auto text-[10px] px-2 py-0" />}
           {isReady && (
-            <span className="text-[10px] text-muted-foreground ml-auto">Требует решения</span>
+            <span className="text-[10px] text-muted-foreground ml-auto">Требует проверки</span>
           )}
         </div>
       ) : (
@@ -167,7 +199,7 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
           <Loader2 className="h-3 w-3 text-[hsl(var(--status-progress))] animate-spin shrink-0" />
         ) : highRisks > 0 ? (
           <AlertTriangle className="h-3 w-3 text-[hsl(var(--risk-high))] shrink-0" />
-        ) : (item?.status === "actual" || isReady) ? (
+        ) : evalStatus === "actual" ? (
           <CheckCircle2 className="h-3 w-3 text-[hsl(var(--status-active))] shrink-0" />
         ) : (
           <Sparkles className="h-3 w-3 text-[hsl(var(--status-progress))] shrink-0" />
