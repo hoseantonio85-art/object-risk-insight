@@ -231,29 +231,25 @@ export function RiskDetailModal({ riskId, onClose, onOpenObject, zIndex = 50 }: 
       <div className="relative z-10 w-full max-w-[1320px] max-h-[92vh] mt-[4vh] bg-background rounded-2xl shadow-2xl border border-border flex flex-col animate-in fade-in-0 zoom-in-95 duration-200">
         {/* ── Sticky Header ── */}
         <div className="sticky top-0 z-20 bg-background rounded-t-2xl border-b border-border px-8 py-4 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground font-medium">Риск</span>
-                <span className="inline-flex items-center rounded-full bg-[hsl(var(--status-active-bg))] text-[hsl(var(--status-active))] px-2 py-0.5 text-xs font-medium">Активен</span>
-                {isBehavior && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(270_60%_95%)] text-[hsl(270_60%_40%)] px-2 py-0.5 text-xs font-medium">
-                    <ShieldAlert className="h-3 w-3" />
-                    Поведенческий
-                  </span>
-                )}
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-foreground">{risk.name}</h1>
-              </div>
+          {/* Row 1: Status chips */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              {isBehavior && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[hsl(270_60%_95%)] text-[hsl(270_60%_40%)] px-2 py-0.5 text-[10px] font-medium">
+                  <ShieldAlert className="h-3 w-3" />
+                  Поведенческий
+                </span>
+              )}
               <RiskBadge level={risk.level} />
             </div>
             <button onClick={onClose} className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
               <X className="h-4 w-4" />
             </button>
           </div>
-          {/* Sticky nav chips */}
-          <div className="flex items-center gap-1.5 mt-3 -mb-1">
+          {/* Row 2: Title */}
+          <h1 className="text-lg font-semibold text-foreground mb-3">{risk.name}</h1>
+          {/* Row 3: Navigation */}
+          <div className="flex items-center gap-1.5 -mb-1">
             {sections.map(s => (
               <button key={s.id} onClick={() => scrollToSection(s.id)}
                 className={cn("px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
