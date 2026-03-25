@@ -314,6 +314,32 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
         {/* ── Scrollable Content ── */}
         <div ref={scrollRef} className="overflow-y-auto flex-1 no-scrollbar">
+          {isNoEvaluation ? (
+            /* ── Empty Evaluation State ── */
+            <div className="flex items-center justify-center p-8 min-h-[400px]">
+              <div className="max-w-md text-center space-y-4">
+                <div className="mx-auto h-14 w-14 rounded-2xl bg-[hsl(var(--brand-green)/0.1)] flex items-center justify-center">
+                  <FileText className="h-7 w-7 text-[hsl(var(--brand-green))]" />
+                </div>
+                <div className="space-y-2">
+                  <h2 className="text-base font-semibold text-foreground">Это новая версия продукта</h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Загрузите документы, чтобы провести оценку рисков.
+                  </p>
+                  <p className="text-xs text-muted-foreground/70">
+                    Продукт был обнаружен системой и привязан к существующему. Оценка рисков ещё не проводилась.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setReEvalModalOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--brand-green))] text-[hsl(var(--brand-green-foreground))] px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-all"
+                >
+                  <FileText className="h-4 w-4" />
+                  Загрузить документы
+                </button>
+              </div>
+            </div>
+          ) : (
           <div className="flex gap-6 p-8">
             {/* Main column */}
             <div className="flex-1 min-w-0 space-y-6">
