@@ -332,14 +332,9 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
   /* ─── Build shell props ─── */
   const statusChips = (
-    <>
-      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
-        {lifecycleLabels[lifecycle]}
-      </span>
-      <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", evalInfo.className)}>
-        {evalInfo.label}
-      </span>
-    </>
+    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", lifecycleStyleMap[lifecycle])}>
+      {lifecycleLabels[lifecycle]}
+    </span>
   );
 
   const titleRight = !isNoEvaluation && !isAiAnalysis ? <RiskBadge level={obj.riskLevel} /> : undefined;
@@ -500,6 +495,12 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Последняя оценка</span>
                   <span className="text-foreground">{obj.lastAssessment ?? "—"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Статус оценки</span>
+                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", evalInfo.className)}>
+                    {evalInfo.label}
+                  </span>
                 </div>
                 {!isNoEvaluation && (
                   <div className="flex justify-between">
