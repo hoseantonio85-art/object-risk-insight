@@ -17,7 +17,7 @@ const queryClient = new QueryClient();
 
 // Не изменять этот блок: специфическая настройка basename для GitHub Pages
 const isGitHubPages = window.location.hostname.includes("github.io");
-const basename = isGitHubPages ? "/object-guard-pulse" : "";
+const basename = isGitHubPages ? "/object-risk-insight" : "";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
