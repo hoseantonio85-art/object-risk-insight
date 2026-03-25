@@ -277,6 +277,9 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
     // Simulate completion after delay
     setTimeout(() => {
+      clearInterval(progressInterval);
+      setAnalysisProgress(100);
+
       const completionSummary = wasNoEvaluation
         ? `Анализ продукта «${obj.name}» выявил ${totalRisks} проявлений рисков, из них ${highRisks} высокого уровня. Обнаружены поведенческие риски, связанные с прозрачностью условий и согласием клиентов.`
         : (obj.riskLevel === "medium"
