@@ -4,7 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { lifecycleLabels, type ProductLifecycle } from "@/data/mock";
 
-interface InProgressProduct {
+export interface InProgressProduct {
   id: string;
   name: string;
   startedAt: number;
@@ -14,6 +14,8 @@ interface InProgressProduct {
   lifecycle?: string;
   description?: string;
   createdDate?: string;
+  launchDate?: string;
+  generatedManifestations?: Array<{ riskId: string; level: string; comment: string }>;
 }
 
 const lifecycleStyleMap: Record<string, string> = {
