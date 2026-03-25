@@ -2,8 +2,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
   X, ChevronDown, Sparkles, Clock, Target,
   Scale, Newspaper, FileText, Bot, User, Info,
-  Check, XCircle, ArrowRight, ChevronRight, ShieldAlert
+  Check, XCircle, ArrowRight, ChevronRight, ShieldAlert, Trash2, RotateCcw, CheckCircle2
 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 import { RiskBadge } from "@/components/RiskBadge";
 import {
   objects, getManifestationsForObject, assessmentHistory, typeLabels, riskTypeLabels,
