@@ -54,7 +54,7 @@ interface InProgressProduct {
 }
 
 // Mock discovered products
-const discoveredProducts = ["СберПей Лайт", "Инвест-Консалт"];
+const discoveredProducts = ["SmartPay Lite", "Инвест-Консалт"];
 
 const generateProductId = () => `np-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
