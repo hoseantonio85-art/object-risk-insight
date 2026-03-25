@@ -168,6 +168,10 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
     onClose();
   };
 
+  const setManifestationStatus = (idx: number, status: ManifestationStatus) => {
+    setStatuses(prev => ({ ...prev, [idx]: status }));
+  };
+
   return (
     <div className="fixed inset-0 flex items-start justify-center" style={{ zIndex }}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
