@@ -358,6 +358,39 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
         />
       )}
 
+      {/* Detected product modal */}
+      {activeDetected && (
+        <DetectedProductModal
+          product={activeDetected}
+          onClose={() => setActiveDetected(null)}
+          onLinked={(detectedId, existingId) => {
+            setDetected((prev) => prev.filter((d) => d.id !== detectedId));
+            setActiveDetected(null);
+            openObject(existingId);
+          }}
+          onContinueAsNew={(detectedId) => {
+            const dp = detected.find((d) => d.id === detectedId);
+            if (dp) {
+              const newId = generateProductId();
+              objects.unshift({
+                id: newId,
+                name: dp.name,
+                type: "product",
+                riskLevel: "none",
+                status: "none",
+                lastAssessment: null,
+                lifecycle: dp.lifecycle,
+                evaluationStatus: "ai-analysis",
+              });
+              setDetected((prev) => prev.filter((d) => d.id !== detectedId));
+              setActiveDetected(null);
+              openObject(newId);
+            }
+          }}
+          zIndex={60}
+        />
+      )}
+
       </div>
   );
 }
