@@ -732,20 +732,22 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                       {lifecycleLabels[lifecycle]}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Статус оценки</span>
-                    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium", evalInfo.className)}>
-                      {evalInfo.label}
-                    </span>
-                  </div>
+                  {obj.createdDate && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Дата создания</span>
+                      <span className="text-foreground">{obj.createdDate}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Последняя оценка</span>
                     <span className="text-foreground">{obj.lastAssessment ?? "—"}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Риски</span>
-                    <span className="text-foreground">{manifestationsData.length}</span>
-                  </div>
+                  {!isNoEvaluation && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Риски</span>
+                      <span className="text-foreground">{manifestationsData.length}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
