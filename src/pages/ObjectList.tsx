@@ -26,6 +26,7 @@ const evalStatusOptions: { value: EvaluationStatus | "all"; label: string }[] = 
   { value: "actual", label: "Актуально" },
   { value: "needs-review", label: "Требует проверки" },
   { value: "ai-analysis", label: "AI анализ" },
+  { value: "none", label: "Нет оценки" },
 ];
 
 const typeConfig: Record<ObjectType, { title: string }> = {
