@@ -500,11 +500,30 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
         {/* Bottom actions */}
         <div className="border-t border-border px-8 py-4 flex items-center justify-end gap-3">
-          <button className="text-sm text-muted-foreground hover:text-foreground transition-colors">Отменить</button>
-          <button className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity">
-            <Check className="h-4 w-4" />
-            Принять оценку
-          </button>
+          {isNeedsReview && !accepted && (
+            <>
+              <button
+                onClick={handleDeleteEvaluation}
+                className="inline-flex items-center gap-1.5 text-sm text-destructive hover:text-destructive/80 transition-colors"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Удалить оценку
+              </button>
+              <button
+                onClick={handleAcceptEvaluation}
+                className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                <Check className="h-4 w-4" />
+                Принять оценку
+              </button>
+            </>
+          )}
+          {accepted && (
+            <button className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors">
+              <RotateCcw className="h-3.5 w-3.5" />
+              Запустить переоценку
+            </button>
+          )}
         </div>
 
         {/* ── Manifestation Drawer ── */}
