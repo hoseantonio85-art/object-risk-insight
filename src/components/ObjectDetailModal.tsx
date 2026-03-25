@@ -285,9 +285,9 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
                   </div>
                   {manifestationsData.length > 0 && (
                     <div className="flex items-center gap-2">
-                      {highCount > 0 && <span className="inline-flex items-center rounded-full bg-[hsl(var(--risk-high-bg))] text-[hsl(var(--risk-high))] px-2 py-0.5 text-xs font-medium">High {highCount}</span>}
-                      {mediumCount > 0 && <span className="inline-flex items-center rounded-full bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))] px-2 py-0.5 text-xs font-medium">Medium {mediumCount}</span>}
-                      {lowCount > 0 && <span className="inline-flex items-center rounded-full bg-[hsl(var(--risk-low-bg))] text-[hsl(var(--risk-low))] px-2 py-0.5 text-xs font-medium">Low {lowCount}</span>}
+                      {highCount > 0 && <span className="inline-flex items-center rounded-full bg-[hsl(var(--risk-high-bg))] text-[hsl(var(--risk-high))] px-2 py-0.5 text-xs font-medium">Высокий {highCount}</span>}
+                      {mediumCount > 0 && <span className="inline-flex items-center rounded-full bg-[hsl(var(--risk-medium-bg))] text-[hsl(var(--risk-medium))] px-2 py-0.5 text-xs font-medium">Средний {mediumCount}</span>}
+                      {lowCount > 0 && <span className="inline-flex items-center rounded-full bg-[hsl(var(--risk-low-bg))] text-[hsl(var(--risk-low))] px-2 py-0.5 text-xs font-medium">Низкий {lowCount}</span>}
                     </div>
                   )}
                 </div>

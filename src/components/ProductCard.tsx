@@ -107,43 +107,52 @@ export function InProgressProductCard({
   product: InProgressProduct;
   onClick: () => void;
 }) {
+  const isAnalyzing = !product.done;
+  const statusLabel = isAnalyzing ? "AI анализ" : "В работе";
+  const statusHint = isAnalyzing
+    ? "Идёт анализ документов"
+    : "Анализ завершён — проверьте результаты";
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full rounded-xl border border-[hsl(var(--status-progress)/0.3)] bg-card p-4 text-left cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      className={cn(
+        "w-full rounded-xl border bg-card p-4 text-left cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        isAnalyzing
+          ? "border-[hsl(var(--status-progress)/0.3)] opacity-90"
+          : "border-[hsl(var(--brand-green)/0.3)]"
+      )}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-lg bg-[hsl(var(--status-progress-bg))] flex items-center justify-center shrink-0">
-            {product.done ? (
-              <Sparkles className="h-4 w-4 text-[hsl(var(--brand-green))]" />
-            ) : (
+          <div className={cn(
+            "h-8 w-8 rounded-lg flex items-center justify-center shrink-0",
+            isAnalyzing ? "bg-[hsl(var(--status-progress-bg))]" : "bg-[hsl(var(--brand-green-bg))]"
+          )}>
+            {isAnalyzing ? (
               <Loader2 className="h-4 w-4 text-[hsl(var(--status-progress))] animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4 text-[hsl(var(--brand-green))]" />
             )}
           </div>
           <div className="min-w-0">
             <h3 className="text-sm font-semibold text-foreground truncate">{product.name}</h3>
           </div>
         </div>
-        {product.done ? (
-          <span className="inline-flex items-center rounded-full bg-[hsl(var(--brand-green-bg))] text-[hsl(var(--brand-green))] px-2 py-0.5 text-[10px] font-medium shrink-0">
-            Готово
-          </span>
-        ) : (
-          <span className="inline-flex items-center rounded-full bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))] px-2 py-0.5 text-[10px] font-medium shrink-0">
-            В работе
-          </span>
-        )}
+        <span className={cn(
+          "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium shrink-0",
+          isAnalyzing
+            ? "bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]"
+            : "bg-[hsl(var(--brand-green-bg))] text-[hsl(var(--brand-green))]"
+        )}>
+          {statusLabel}
+        </span>
       </div>
 
-      <p className="text-xs text-muted-foreground mb-3">
-        {product.done
-          ? "Оценка завершена — откройте для просмотра"
-          : "AI анализирует документы"}
-      </p>
+      <p className="text-xs text-muted-foreground mb-3">{statusHint}</p>
 
-      {!product.done && (
+      {isAnalyzing && (
         <div className="flex items-center gap-3">
           <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
             <div
