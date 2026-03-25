@@ -7,8 +7,11 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { useModalStack } from "@/contexts/ModalStackContext";
 import { ProductEvaluationModal, type ProductEvaluationStartPayload } from "@/components/ProductEvaluationModal";
 import { InProgressProductModal } from "@/components/InProgressProductModal";
-import { ProductCard, DiscoveredProductPill } from "@/components/ProductCard";
+import { ProductCard } from "@/components/ProductCard";
+import { DetectedProductCard } from "@/components/DetectedProductCard";
+import { DetectedProductModal } from "@/components/DetectedProductModal";
 import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, manifestations, objects, assessmentHistory, type EvaluationStatus } from "@/data/mock";
+import { detectedProducts as initialDetectedProducts, type DetectedProduct } from "@/data/detectedProducts";
 import { cn } from "@/lib/utils";
 
 const riskOptions: { value: RiskLevel | "all"; label: string }[] = [
@@ -53,11 +56,7 @@ interface InProgressProduct {
   generatedManifestations: Array<{ riskId: string; level: RiskLevel; comment: string }>;
 }
 
-// Mock discovered products
-const discoveredProducts = ["SmartPay Lite", "Инвест-Консалт"];
-
 const generateProductId = () => `np-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
 const createGeneratedManifestations = (productName: string): InProgressProduct["generatedManifestations"] => [
   {
     riskId: "br1",
@@ -95,6 +94,8 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
   const [showEvalModal, setShowEvalModal] = useState(false);
   const [inProgress, setInProgress] = useState<InProgressProduct[]>([]);
   const [activeAnalyzing, setActiveAnalyzing] = useState<InProgressProduct | null>(null);
+  const [detected, setDetected] = useState<DetectedProduct[]>(initialDetectedProducts);
+  const [activeDetected, setActiveDetected] = useState<DetectedProduct | null>(null);
   const finalizedProductIds = useRef<Set<string>>(new Set());
 
   // Simulate progress
@@ -268,19 +269,19 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
         </button>
       </div>
 
-      {/* Discovered products (stories) */}
-      {discoveredProducts.length > 0 && (
+      {/* Detected products (stories) */}
+      {detected.length > 0 && (
         <div className="animate-fade-up stagger-1">
           <div className="flex items-center gap-2 mb-2.5">
             <Sparkles className="h-4 w-4 text-[hsl(var(--brand-green))]" />
             <span className="text-sm font-medium text-foreground">Обнаружены продукты</span>
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            {discoveredProducts.map((name) => (
-              <DiscoveredProductPill
-                key={name}
-                name={name}
-                onClick={() => setShowEvalModal(true)}
+          <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-1">
+            {detected.map((dp) => (
+              <DetectedProductCard
+                key={dp.id}
+                product={dp}
+                onClick={() => setActiveDetected(dp)}
               />
             ))}
           </div>
@@ -353,6 +354,39 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
         <InProgressProductModal
           product={activeAnalyzing}
           onClose={() => setActiveAnalyzing(null)}
+          zIndex={60}
+        />
+      )}
+
+      {/* Detected product modal */}
+      {activeDetected && (
+        <DetectedProductModal
+          product={activeDetected}
+          onClose={() => setActiveDetected(null)}
+          onLinked={(detectedId, existingId) => {
+            setDetected((prev) => prev.filter((d) => d.id !== detectedId));
+            setActiveDetected(null);
+            openObject(existingId);
+          }}
+          onContinueAsNew={(detectedId) => {
+            const dp = detected.find((d) => d.id === detectedId);
+            if (dp) {
+              const newId = generateProductId();
+              objects.unshift({
+                id: newId,
+                name: dp.name,
+                type: "product",
+                riskLevel: "none",
+                status: "none",
+                lastAssessment: null,
+                lifecycle: dp.lifecycle,
+                evaluationStatus: "ai-analysis",
+              });
+              setDetected((prev) => prev.filter((d) => d.id !== detectedId));
+              setActiveDetected(null);
+              openObject(newId);
+            }
+          }}
           zIndex={60}
         />
       )}
