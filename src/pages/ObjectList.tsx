@@ -63,7 +63,7 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [showEvalModal, setShowEvalModal] = useState(false);
   const [inProgress, setInProgress] = useState<InProgressProduct[]>([]);
-  const [activeInProgress, setActiveInProgress] = useState<InProgressProduct | null>(null);
+  // removed activeInProgress state — in-progress cards now open the full product modal
 
   // Simulate progress
   useEffect(() => {
