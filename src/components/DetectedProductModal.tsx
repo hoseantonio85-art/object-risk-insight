@@ -214,6 +214,30 @@ export function DetectedProductModal({
     </>
   ) : null;
 
+  /* ─── Description drawer ─── */
+  const descriptionDrawer = showDescriptionDrawer ? (
+    <>
+      <div
+        className="absolute inset-0 z-30 bg-black/20 rounded-2xl"
+        onClick={() => setShowDescriptionDrawer(false)}
+      />
+      <div className="absolute top-0 right-0 bottom-0 w-full max-w-md bg-background border-l border-border z-40 shadow-xl animate-in slide-in-from-right duration-200 flex flex-col rounded-r-2xl">
+        <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0">
+          <h2 className="text-sm font-semibold text-foreground">Описание продукта</h2>
+          <button
+            onClick={() => setShowDescriptionDrawer(false)}
+            className="h-8 w-8 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6">
+          <p className="text-sm text-foreground leading-relaxed">{product.description}</p>
+        </div>
+      </div>
+    </>
+  ) : null;
+
   return (
     <ProductModalShell
       onClose={onClose}
@@ -222,7 +246,7 @@ export function DetectedProductModal({
       title={product.name}
       navigation={navigation}
       footer={footer}
-      drawers={linkDrawer}
+      drawers={<>{linkDrawer}{descriptionDrawer}</>}
     >
       <ModalBody sidebar={metaSidebar}>
         {/* Decision Banner */}
