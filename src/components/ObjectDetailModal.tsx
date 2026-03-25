@@ -2,8 +2,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import {
   X, ChevronDown, Sparkles, Clock, Target,
   Scale, Newspaper, FileText, Bot, User, Info,
-  Check, XCircle, ArrowRight, ChevronRight, ShieldAlert
+  Check, XCircle, ArrowRight, ChevronRight, ShieldAlert, Trash2, RotateCcw, CheckCircle2
 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 import { RiskBadge } from "@/components/RiskBadge";
 import {
   objects, getManifestationsForObject, assessmentHistory, typeLabels, riskTypeLabels,
@@ -101,6 +102,8 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const [sourcesExpanded, setSourcesExpanded] = useState(false);
   const [statuses, setStatuses] = useState<Record<number, ManifestationStatus>>({});
   const [drawerItem, setDrawerItem] = useState<{ index: number; data: ReturnType<typeof getManifestationsForObject>[number] } | null>(null);
+  const [localEvalStatus, setLocalEvalStatus] = useState<string | null>(null);
+  const [accepted, setAccepted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
@@ -144,8 +147,26 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const previewSources = sources.slice(0, 2);
 
   const lifecycle = obj.lifecycle || "active";
-  const evaluationStatus = obj.evaluationStatus || "actual";
+  const evaluationStatus = localEvalStatus || obj.evaluationStatus || "actual";
   const evalInfo = evalStyleMap[evaluationStatus] || evalStyleMap.actual;
+
+  const isNeedsReview = evaluationStatus === "needs-review";
+  const isConfirmed = evaluationStatus === "actual" || accepted;
+
+  const handleAcceptEvaluation = () => {
+    setLocalEvalStatus("actual");
+    setAccepted(true);
+    // Update the object in mock data
+    const objIndex = objects.findIndex(o => o.id === objectId);
+    if (objIndex !== -1) {
+      objects[objIndex].evaluationStatus = "actual";
+    }
+    toast({ title: "Оценка принята", description: "Оценка риска подтверждена и учтена в продукте." });
+  };
+
+  const handleDeleteEvaluation = () => {
+    onClose();
+  };
 
   const setManifestationStatus = (idx: number, status: ManifestationStatus) => {
     setStatuses(prev => ({ ...prev, [idx]: status }));
@@ -200,6 +221,22 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
               {/* ── OVERVIEW ── */}
               <section ref={setSectionRef("overview")} className="space-y-6">
+                {/* Inline success alert after acceptance */}
+                {accepted && (
+                  <div className="rounded-xl border border-[hsl(var(--status-active))/0.3] bg-[hsl(var(--status-active-bg))] p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="h-7 w-7 rounded-lg bg-[hsl(var(--status-active))/0.15] flex items-center justify-center shrink-0 mt-0.5">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-[hsl(var(--status-active))]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-[hsl(var(--status-active))] mb-0.5">Оценка риска подтверждена</p>
+                        <p className="text-xs text-[hsl(var(--status-active))/0.8]">
+                          Подтверждённые проявления учтены в продукте и могут влиять на корпоративные риски.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 {/* Sources context banner */}
                 {sources.length > 0 && (
                   <div className="rounded-xl border border-[hsl(200_80%_85%)] bg-[hsl(200_80%_97%)] p-4">
@@ -463,11 +500,30 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
 
         {/* Bottom actions */}
         <div className="border-t border-border px-8 py-4 flex items-center justify-end gap-3">
-          <button className="text-sm text-muted-foreground hover:text-foreground transition-colors">Отменить</button>
-          <button className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity">
-            <Check className="h-4 w-4" />
-            Принять оценку
-          </button>
+          {isNeedsReview && !accepted && (
+            <>
+              <button
+                onClick={handleDeleteEvaluation}
+                className="inline-flex items-center gap-1.5 text-sm text-destructive hover:text-destructive/80 transition-colors"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Удалить оценку
+              </button>
+              <button
+                onClick={handleAcceptEvaluation}
+                className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-4 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+              >
+                <Check className="h-4 w-4" />
+                Принять оценку
+              </button>
+            </>
+          )}
+          {accepted && (
+            <button className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors">
+              <RotateCcw className="h-3.5 w-3.5" />
+              Запустить переоценку
+            </button>
+          )}
         </div>
 
         {/* ── Manifestation Drawer ── */}
