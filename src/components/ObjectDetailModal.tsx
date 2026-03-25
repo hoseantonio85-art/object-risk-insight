@@ -174,7 +174,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
   const previewManifestations = manifestationsData.slice(0, 3);
   const previewSources = sources.slice(0, 2);
 
-  const lifecycle = obj.lifecycle || "active";
+  const lifecycle = localLifecycle || obj.lifecycle || "active";
   const evaluationStatus = localEvalStatus || obj.evaluationStatus || "actual";
   const evalInfo = evalStyleMap[evaluationStatus] || evalStyleMap.actual;
 
