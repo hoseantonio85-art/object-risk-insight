@@ -642,6 +642,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
               )}
             </div>
           </div>
+          )}
         </div>
 
         {/* Bottom actions */}
