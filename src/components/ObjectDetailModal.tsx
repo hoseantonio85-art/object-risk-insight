@@ -398,19 +398,6 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             /* ── Empty Evaluation State ── */
             <div className="flex items-center justify-center p-8 min-h-[400px]">
               <div className="max-w-md text-center space-y-4">
-                {/* Activate button for planned products */}
-                {lifecycle === "planned" && (
-                  <div className="rounded-xl border border-[hsl(var(--lifecycle-planned)/0.3)] bg-[hsl(var(--lifecycle-planned-bg))] p-4 mb-2">
-                    <p className="text-sm text-foreground mb-3">Продукт находится в статусе «Планируемый»</p>
-                    <button
-                      onClick={handleActivateProduct}
-                      className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-all"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                      Перевести в действующие
-                    </button>
-                  </div>
-                )}
                 <div className="mx-auto h-14 w-14 rounded-2xl bg-[hsl(var(--brand-green)/0.1)] flex items-center justify-center">
                   <FileText className="h-7 w-7 text-[hsl(var(--brand-green))]" />
                 </div>
