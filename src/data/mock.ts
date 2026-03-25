@@ -1,5 +1,7 @@
 export type RiskLevel = "high" | "medium" | "low" | "none";
 export type AssessmentStatus = "actual" | "stale" | "progress" | "none";
+export type EvaluationStatus = "ai-analysis" | "needs-review" | "actual";
+export type ProductLifecycle = "planned" | "active" | "closed";
 export type ObjectType = "product" | "counterparty" | "contract" | "ai-agent";
 export type RiskType = "operational" | "behavior";
 
@@ -11,6 +13,9 @@ export interface ObjectItem {
   status: AssessmentStatus;
   lastAssessment: string | null;
   description?: string;
+  /** Product-specific fields */
+  lifecycle?: ProductLifecycle;
+  evaluationStatus?: EvaluationStatus;
 }
 
 export interface RiskItem {
@@ -35,12 +40,24 @@ export interface AssessmentEntry {
   level: RiskLevel;
 }
 
+export const lifecycleLabels: Record<ProductLifecycle, string> = {
+  planned: "Планируемый",
+  active: "Действующий",
+  closed: "Закрыт",
+};
+
+export const evaluationStatusLabels: Record<EvaluationStatus, string> = {
+  "ai-analysis": "AI анализ",
+  "needs-review": "Требует проверки",
+  actual: "Актуально",
+};
+
 export const objects: ObjectItem[] = [
-  { id: "p1", name: "CRM Enterprise", type: "product", riskLevel: "high", status: "actual", lastAssessment: "2026-03-15", description: "Основная CRM-система для корпоративных клиентов" },
-  { id: "p2", name: "Мобильный банк 3.0", type: "product", riskLevel: "high", status: "stale", lastAssessment: "2026-01-20", description: "Мобильное приложение для розничных клиентов" },
-  { id: "p3", name: "Платёжный шлюз", type: "product", riskLevel: "medium", status: "actual", lastAssessment: "2026-03-10", description: "Шлюз обработки платежей" },
-  { id: "p4", name: "Внутренний портал", type: "product", riskLevel: "low", status: "actual", lastAssessment: "2026-03-12", description: "Портал для сотрудников компании" },
-  { id: "p5", name: "Data Lake", type: "product", riskLevel: "high", status: "progress", lastAssessment: "2026-02-28", description: "Централизованное хранилище данных" },
+  { id: "p1", name: "CRM Enterprise", type: "product", riskLevel: "high", status: "actual", lastAssessment: "2026-03-15", description: "Основная CRM-система для корпоративных клиентов", lifecycle: "active", evaluationStatus: "actual" },
+  { id: "p2", name: "Мобильный банк 3.0", type: "product", riskLevel: "high", status: "stale", lastAssessment: "2026-01-20", description: "Мобильное приложение для розничных клиентов", lifecycle: "active", evaluationStatus: "needs-review" },
+  { id: "p3", name: "Платёжный шлюз", type: "product", riskLevel: "medium", status: "actual", lastAssessment: "2026-03-10", description: "Шлюз обработки платежей", lifecycle: "active", evaluationStatus: "actual" },
+  { id: "p4", name: "Внутренний портал", type: "product", riskLevel: "low", status: "actual", lastAssessment: "2026-03-12", description: "Портал для сотрудников компании", lifecycle: "active", evaluationStatus: "actual" },
+  { id: "p5", name: "Data Lake", type: "product", riskLevel: "high", status: "progress", lastAssessment: "2026-02-28", description: "Централизованное хранилище данных", lifecycle: "active", evaluationStatus: "needs-review" },
   { id: "c1", name: "ООО «ТехноСофт»", type: "counterparty", riskLevel: "high", status: "actual", lastAssessment: "2026-03-14", description: "Поставщик IT-инфраструктуры" },
   { id: "c2", name: "CloudServe Inc.", type: "counterparty", riskLevel: "medium", status: "stale", lastAssessment: "2025-12-01", description: "Облачный провайдер" },
   { id: "c3", name: "ИП Сидорова А.В.", type: "counterparty", riskLevel: "high", status: "actual", lastAssessment: "2026-03-18", description: "Консультант по безопасности" },
