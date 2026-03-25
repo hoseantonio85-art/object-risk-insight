@@ -14,7 +14,6 @@ interface InProgressProduct {
   lifecycle?: string;
   description?: string;
   createdDate?: string;
-  [key: string]: unknown;
 }
 
 const lifecycleStyleMap: Record<string, string> = {
