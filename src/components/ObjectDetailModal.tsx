@@ -354,7 +354,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-lg font-semibold text-foreground">{obj.name}</h1>
             <div className="flex items-center gap-3">
-              {!isNoEvaluation && <RiskBadge level={obj.riskLevel} />}
+              {!isNoEvaluation && !isAiAnalysis && <RiskBadge level={obj.riskLevel} />}
               <button onClick={onClose} className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <X className="h-4 w-4" />
               </button>
