@@ -34,10 +34,12 @@ export function ProductCard({ item, onClick }: { item: ObjectItem; onClick: () =
         : "Оценка завершена";
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
       className={cn(
-        "group rounded-xl border bg-card p-4 cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5",
+        "group w-full rounded-xl border bg-card p-4 text-left cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         needsAttention && item.status !== "progress"
           ? "border-[hsl(var(--risk-medium)/0.3)]"
           : "border-border"
@@ -94,7 +96,7 @@ export function ProductCard({ item, onClick }: { item: ObjectItem; onClick: () =
         <span className="text-[11px] text-muted-foreground truncate">{activityHint}</span>
         <ArrowRight className="h-3 w-3 text-muted-foreground/50 ml-auto shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -103,12 +105,13 @@ export function InProgressProductCard({
   onClick,
 }: {
   product: InProgressProduct;
-  onClick?: () => void;
+  onClick: () => void;
 }) {
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
-      className="rounded-xl border border-[hsl(var(--status-progress)/0.3)] bg-card p-4 cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+      className="w-full rounded-xl border border-[hsl(var(--status-progress)/0.3)] bg-card p-4 text-left cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2.5">
@@ -153,7 +156,7 @@ export function InProgressProductCard({
           </span>
         </div>
       )}
-    </div>
+    </button>
   );
 }
 
