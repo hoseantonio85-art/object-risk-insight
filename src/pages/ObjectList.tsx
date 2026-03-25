@@ -227,7 +227,15 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
             <InProgressProductCard
               key={i}
               product={p}
-              onClick={() => openObject("p5")}
+              onClick={() => {
+                if (p.done) {
+                  // "В работе" — open full product modal
+                  openObject("p5");
+                } else {
+                  // "AI анализ" — open lightweight analyzing modal
+                  setActiveAnalyzing(p);
+                }
+              }}
             />
           ))}
         </div>
