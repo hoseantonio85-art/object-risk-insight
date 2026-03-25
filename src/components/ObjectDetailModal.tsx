@@ -774,6 +774,17 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             }}
           />
         )}
+
+        {/* ── Re-Evaluation Modal ── */}
+        {reEvalModalOpen && (
+          <ProductReEvaluationModal
+            productName={obj.name}
+            currentVersion={currentVersion}
+            onClose={() => setReEvalModalOpen(false)}
+            onStarted={handleReEvaluationStarted}
+            zIndex={(zIndex || 50) + 10}
+          />
+        )}
       </div>
     </div>
   );
