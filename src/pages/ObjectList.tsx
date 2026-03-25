@@ -6,6 +6,7 @@ import { RiskBadge } from "@/components/RiskBadge";
 import { StatusBadge } from "@/components/StatusBadge";
 import { useModalStack } from "@/contexts/ModalStackContext";
 import { ProductEvaluationModal } from "@/components/ProductEvaluationModal";
+import { InProgressProductModal } from "@/components/InProgressProductModal";
 import { ProductCard, InProgressProductCard, DiscoveredProductPill } from "@/components/ProductCard";
 import { getObjectsByType, ObjectType, RiskLevel, AssessmentStatus, manifestations } from "@/data/mock";
 import { cn } from "@/lib/utils";
