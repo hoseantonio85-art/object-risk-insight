@@ -19,9 +19,8 @@ import { cn } from "@/lib/utils";
 
 const objectSubItems = [
   { title: "Обзор", path: "/objects", icon: LayoutDashboard },
-  { title: "Продукты", path: "/objects/products", icon: Package },
+  { title: "Продукты", path: "/objects/products", icon: Package, badge: "NEW" },
   { title: "Контрагенты", path: "/objects/counterparties", icon: Users },
-  { title: "Договоры", path: "/objects/contracts", icon: FileText },
   { title: "AI-агенты", path: "/objects/ai-agents", icon: Bot },
 ];
 
@@ -93,6 +92,11 @@ export function AppSidebar() {
                 <div key={item.path} className={linkClass(item.path)} onClick={() => navigate(item.path)}>
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
+                  {item.badge && (
+                    <span className="ml-auto rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase leading-none text-primary">
+                      {item.badge}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
