@@ -56,7 +56,7 @@ interface InProgressProduct {
   generatedManifestations: Array<{ riskId: string; level: RiskLevel; comment: string }>;
 }
 
-// No longer needed - using detectedProducts from data file
+const generateProductId = () => `np-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 const createGeneratedManifestations = (productName: string): InProgressProduct["generatedManifestations"] => [
   {
     riskId: "br1",
@@ -94,6 +94,8 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
   const [showEvalModal, setShowEvalModal] = useState(false);
   const [inProgress, setInProgress] = useState<InProgressProduct[]>([]);
   const [activeAnalyzing, setActiveAnalyzing] = useState<InProgressProduct | null>(null);
+  const [detected, setDetected] = useState<DetectedProduct[]>(initialDetectedProducts);
+  const [activeDetected, setActiveDetected] = useState<DetectedProduct | null>(null);
   const finalizedProductIds = useRef<Set<string>>(new Set());
 
   // Simulate progress
@@ -267,19 +269,19 @@ export default function ObjectList({ objectType }: { objectType: ObjectType }) {
         </button>
       </div>
 
-      {/* Discovered products (stories) */}
-      {discoveredProducts.length > 0 && (
+      {/* Detected products (stories) */}
+      {detected.length > 0 && (
         <div className="animate-fade-up stagger-1">
           <div className="flex items-center gap-2 mb-2.5">
             <Sparkles className="h-4 w-4 text-[hsl(var(--brand-green))]" />
             <span className="text-sm font-medium text-foreground">Обнаружены продукты</span>
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-            {discoveredProducts.map((name) => (
-              <DiscoveredProductPill
-                key={name}
-                name={name}
-                onClick={() => setShowEvalModal(true)}
+          <div className="flex items-center gap-2.5 overflow-x-auto no-scrollbar pb-1">
+            {detected.map((dp) => (
+              <DetectedProductCard
+                key={dp.id}
+                product={dp}
+                onClick={() => setActiveDetected(dp)}
               />
             ))}
           </div>
