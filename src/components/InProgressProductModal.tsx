@@ -64,26 +64,24 @@ export function InProgressProductModal({
           </div>
 
           {/* Progress */}
-          {!product.done && (
-            <div className="rounded-xl border border-border bg-card p-5">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-foreground">Прогресс анализа</span>
-                <span className="text-sm font-semibold text-foreground tabular-nums">{progressPct}%</span>
-              </div>
-              <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-[hsl(var(--status-progress))] transition-all duration-700 ease-out"
-                  style={{ width: `${progressPct}%` }}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                {progressPct < 30 ? "Загружаю и обрабатываю документы…" :
-                 progressPct < 60 ? "Анализирую содержание…" :
-                 progressPct < 90 ? "Формирую выводы…" :
-                 "Собираю итоговый отчёт…"}
-              </p>
+          <div className="rounded-xl border border-border bg-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-foreground">Прогресс анализа</span>
+              <span className="text-sm font-semibold text-foreground tabular-nums">{progressPct}%</span>
             </div>
-          )}
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full bg-[hsl(var(--status-progress))] transition-all duration-700 ease-out"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {progressPct < 30 ? "Загружаю и обрабатываю документы…" :
+               progressPct < 60 ? "Анализирую содержание…" :
+               progressPct < 90 ? "Формирую выводы…" :
+               "Собираю итоговый отчёт…"}
+            </p>
+          </div>
 
           {/* Documents placeholder */}
           <div className="rounded-xl border border-border bg-card p-5">
