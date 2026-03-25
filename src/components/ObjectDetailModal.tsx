@@ -196,6 +196,15 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
     onClose();
   };
 
+  const handleActivateProduct = () => {
+    setLocalLifecycle("active");
+    const objIndex = objects.findIndex(o => o.id === objectId);
+    if (objIndex !== -1) {
+      objects[objIndex].lifecycle = "active";
+    }
+    toast({ title: "Продукт переведён в действующие", description: "Жизненный цикл продукта обновлён." });
+  };
+
   const handleReEvaluationStarted = (payload: ReEvaluationStartPayload) => {
     const newVersion = currentVersion + 1;
     const triggerMap: Record<string, ProductVersion["trigger"]> = {
