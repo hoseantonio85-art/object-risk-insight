@@ -646,6 +646,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
         </div>
 
         {/* Bottom actions */}
+        {!isNoEvaluation && (
         <div className="border-t border-border px-8 py-4 flex items-center justify-end gap-3">
           {isNeedsReview && !accepted && (
             <>
@@ -675,6 +676,7 @@ export function ObjectDetailModal({ objectId, onClose, onOpenRisk, zIndex = 50 }
             </button>
           )}
         </div>
+        )}
 
         {/* ── Manifestation Drawer ── */}
         {drawerItem && (() => {
