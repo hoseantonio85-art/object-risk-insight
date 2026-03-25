@@ -1,4 +1,4 @@
-import { Loader2, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Loader2, Sparkles, ArrowRight, CheckCircle2, FileText } from "lucide-react";
 import { RiskBadge } from "@/components/RiskBadge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
