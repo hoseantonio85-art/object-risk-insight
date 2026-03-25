@@ -88,9 +88,17 @@ export function ProductCard({ item, inProgressName, inProgressProgress = 0, inPr
       </div>
 
       {/* Row 2: name */}
-      <h3 className="text-sm font-semibold text-foreground truncate mb-2.5 group-hover:text-[hsl(var(--brand-green))] transition-colors">
+      <h3 className="text-sm font-semibold text-foreground truncate mb-1 group-hover:text-[hsl(var(--brand-green))] transition-colors">
         {name}
       </h3>
+
+      {/* Row 2b: description */}
+      {item?.description && (
+        <p className="text-xs text-muted-foreground line-clamp-2 mb-2.5 leading-relaxed">
+          {item.description}
+        </p>
+      )}
+      {!item?.description && <div className="mb-2.5" />}
 
       {/* Row 3: risks count + date */}
       {isAnalyzing ? (
