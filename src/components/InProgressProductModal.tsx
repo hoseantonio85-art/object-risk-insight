@@ -21,26 +21,26 @@ export function InProgressProductModal({
   const progressPct = Math.round(product.progress);
 
   return (
-    <div className="fixed inset-0 flex items-start justify-center pt-[5vh]" style={{ zIndex }}>
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 flex items-start justify-center" style={{ zIndex }}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-[1320px] max-h-[90vh] rounded-2xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col animate-fade-up">
-        {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between px-8 py-5 border-b border-border bg-card/95 backdrop-blur-sm">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-[hsl(var(--status-progress-bg))] flex items-center justify-center">
-              <Loader2 className="h-4.5 w-4.5 text-[hsl(var(--status-progress))] animate-spin" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">{product.name}</h2>
-              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium mt-0.5 bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]">
-                AI анализ
-              </span>
-            </div>
+      <div className="relative z-10 w-full max-w-[1320px] max-h-[92vh] mt-[4vh] bg-background rounded-2xl shadow-2xl border border-border flex flex-col animate-in fade-in-0 zoom-in-95 duration-200">
+        {/* ── Sticky Header ── */}
+        <div className="sticky top-0 z-20 bg-background rounded-t-2xl border-b border-border px-8 py-4 shrink-0">
+          {/* Row 1: Status */}
+          <div className="flex items-center gap-2 mb-2">
+            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium bg-[hsl(var(--status-progress-bg))] text-[hsl(var(--status-progress))]">
+              AI анализ
+            </span>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-accent transition-colors">
-            <X className="h-5 w-5 text-muted-foreground" />
-          </button>
+
+          {/* Row 2: Title + Close */}
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-semibold text-foreground">{product.name}</h1>
+            <button onClick={onClose} className="h-9 w-9 rounded-lg border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
